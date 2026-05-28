@@ -76,9 +76,8 @@ public class MainServlet extends HttpServlet {
 		//
 		final String servletPath = getServletPath(request);
 		//
-		final Iterable<Method> ms = collect(
-				filter(Arrays.stream(Jna.class.getDeclaredMethods()),
-						m -> Objects.equals("/" + getName(m), servletPath) && getParameterCount(m) == 0),
+		final Iterable<Method> ms = collect(filter(Arrays.stream(Jna.class.getDeclaredMethods()),
+				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
 				Collectors.toList());
 		//
 		final Jna jna = cast(Jna.class,
