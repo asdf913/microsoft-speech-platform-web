@@ -3,6 +3,7 @@ package javax.servlet.http;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -320,6 +321,10 @@ class MainServletTest {
 				} else if (Objects.equals(parameterType, Boolean.TYPE)) {
 					//
 					add(collection, Boolean.FALSE);
+					//
+				} else if (Objects.equals(parameterType, Executable.class)) {
+					//
+					add(collection, Object.class.getDeclaredMethod("toString"));
 					//
 				} else if (parameterType != null && parameterType.isArray()) {
 					//

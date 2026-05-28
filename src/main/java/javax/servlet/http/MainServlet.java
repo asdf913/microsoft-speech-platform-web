@@ -3,6 +3,7 @@ package javax.servlet.http;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -77,7 +78,7 @@ public class MainServlet extends HttpServlet {
 		//
 		final Iterable<Method> ms = collect(
 				filter(Arrays.stream(Jna.class.getDeclaredMethods()),
-						m -> m != null && Objects.equals("/" + getName(m), servletPath) && m.getParameterCount() == 0),
+						m -> Objects.equals("/" + getName(m), servletPath) && getParameterCount(m) == 0),
 				Collectors.toList());
 		//
 		final Jna jna = cast(Jna.class,
@@ -165,6 +166,10 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static int getParameterCount(final Executable instance) {
+		return instance != null ? instance.getParameterCount() : 0;
 	}
 
 	private static <T, E extends Throwable> void testAndAccept(final Predicate<T> predicate, final T value,
