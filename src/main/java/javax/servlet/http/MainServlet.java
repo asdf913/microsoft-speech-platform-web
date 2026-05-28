@@ -72,7 +72,7 @@ public class MainServlet extends HttpServlet {
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
 		//
-		final String servletPath = request != null ? request.getServletPath() : null;
+		final String servletPath = getServletPath(request);
 		//
 		final Iterable<Method> ms = collect(
 				filter(Arrays.stream(Jna.class.getDeclaredMethods()),
@@ -146,16 +146,16 @@ public class MainServlet extends HttpServlet {
 				//
 			} finally {
 				//
-				if (file != null) {
-					//
-					FileUtils.delete(file);
-					//
-				} // if
-					//
+				FileUtils.delete(file);
+				//
 			} // try
 				//
 		} // if
 			//
+	}
+
+	private static String getServletPath(final HttpServletRequest instance) {
+		return instance != null ? instance.getServletPath() : null;
 	}
 
 	private static void setContentLength(final ServletResponse instance, final int len) {
