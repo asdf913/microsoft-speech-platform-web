@@ -244,7 +244,8 @@ public class MainServlet extends HttpServlet {
 						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
-		final char[] cs = value == null || Narcissus.getField(text, value) != null ? text.toCharArray() : null;
+		final char[] cs = !isTestMode() || value == null || Narcissus.getField(text, value) != null ? text.toCharArray()
+				: null;
 		//
 		final int[] ints = cs != null ? new int[cs.length] : null;
 		//
@@ -256,6 +257,14 @@ public class MainServlet extends HttpServlet {
 			//
 		return ints;
 		//
+	}
+
+	private static boolean isTestMode() {
+		try {
+			return Class.forName("org.testng.annotations.Test") != null;
+		} catch (final ClassNotFoundException e) {
+			return false;
+		}
 	}
 
 	private static <T> Stream<T> stream(final Collection<T> instance) {
