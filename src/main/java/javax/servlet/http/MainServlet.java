@@ -119,9 +119,7 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				final String text = getParameter(request, "text");
-				//
-				int[] ints = toIntArray(text);
+				int[] ints = toIntArray(getParameter(request, "text"));
 				//
 				final String absolutePath = getAbsolutePath(file = File
 						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File(".")));
