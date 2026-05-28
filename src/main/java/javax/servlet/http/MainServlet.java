@@ -103,7 +103,17 @@ public class MainServlet extends HttpServlet {
 			//
 		} // if
 			//
-		if (Objects.equals(servletPath, "/getVoiceAttribute") && jna != null) {
+		if (Objects.equals(servletPath, "/getVoiceIds") && jna != null) {
+			//
+			try (final OutputStream os = getOutputStream(response)) {
+				//
+				setContentType(response, "application/json");
+				//
+				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(jna.getVoiceIds(null, null), ",")));
+				//
+			} // try
+				//
+		} else if (Objects.equals(servletPath, "/getVoiceAttribute") && jna != null) {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
@@ -113,16 +123,6 @@ public class MainServlet extends HttpServlet {
 						new ObjectMapper().writeValueAsBytes(StringUtils.split(
 								jna.getVoiceAttribute(getParameter(request, "id"), getParameter(request, "attribute")),
 								",")));
-				//
-			} // try
-				//
-		} else if (Objects.equals(servletPath, "/getVoiceIds") && jna != null) {
-			//
-			try (final OutputStream os = getOutputStream(response)) {
-				//
-				setContentType(response, "application/json");
-				//
-				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(jna.getVoiceIds(null, null), ",")));
 				//
 			} // try
 				//
