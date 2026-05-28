@@ -133,7 +133,7 @@ public class MainServlet extends HttpServlet {
 				//
 				setContentType(response, getMimeType(getContentType(new ContentInfoUtil().findMatch(bs))));
 				//
-				setContentLength(response, bs != null ? bs.length : 0);
+				setContentLength(response, length(bs));
 				//
 				write(os, bs);
 				//
@@ -206,6 +206,10 @@ public class MainServlet extends HttpServlet {
 
 	private static String getAbsolutePath(final File instance) {
 		return instance != null && instance.getPath() != null ? instance.getAbsolutePath() : null;
+	}
+
+	private static int length(final byte[] instance) {
+		return instance != null ? instance.length : 0;
 	}
 
 	private static int length(final int[] instance) {
