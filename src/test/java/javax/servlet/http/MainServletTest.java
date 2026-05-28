@@ -449,7 +449,31 @@ class MainServletTest {
 		//
 		if (ih != null) {
 			//
-			ih.servletPath = "/wav";
+			ih.servletPath = "";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
+			ih.servletPath = "/";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
+			ih.servletPath = "/.wav";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
+			ih.servletPath = "/ .wav";
 			//
 		} // if
 			//

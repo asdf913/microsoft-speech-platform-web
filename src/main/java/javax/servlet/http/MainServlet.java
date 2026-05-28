@@ -113,13 +113,14 @@ public class MainServlet extends HttpServlet {
 				//
 			} // try
 				//
-		} else if (Objects.equals(servletPath, "/wav") && jna != null) {
+		} else if (servletPath != null && servletPath.startsWith("/") && servletPath.endsWith(".wav")
+				&& StringUtils.length(servletPath) > 5 && jna != null) {
 			//
 			File file = null;
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				int[] ints = toIntArray(getParameter(request, "text"));
+				int[] ints = toIntArray(StringUtils.substring(servletPath, 1, StringUtils.length(servletPath) - 4));
 				//
 				final String absolutePath = getAbsolutePath(file = File
 						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File(".")));
