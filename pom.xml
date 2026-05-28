@@ -8,6 +8,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
+		<sonar.organization>asdf913</sonar.organization>
 	</properties>
 	<dependencies>
 		<!--https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
