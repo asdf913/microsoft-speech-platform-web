@@ -26,8 +26,10 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
 import com.j256.simplemagic.ContentType;
@@ -103,7 +105,9 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				write(os, getBytes(jna.getVoiceIds(null, null)));
+				setContentType(response, "application/json");
+				//
+				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(jna.getVoiceIds(null, null), ",")));
 				//
 			} // try
 				//

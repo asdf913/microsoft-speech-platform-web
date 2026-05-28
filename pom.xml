@@ -65,6 +65,12 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.5.0</version>
 		</dependency>
+		<!--https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.21.3</version>
+		</dependency>
 		<!--https://mvnrepository.com/artifact/org.testng/testngs -->
 		<dependency>
 			<groupId>org.testng</groupId>
