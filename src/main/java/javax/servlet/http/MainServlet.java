@@ -107,8 +107,6 @@ public class MainServlet extends HttpServlet {
 				//
 			} // try
 				//
-			return;
-			//
 		} else if (Objects.equals(servletPath, "/wav") && jna != null) {
 			//
 			File file = null;
@@ -143,8 +141,6 @@ public class MainServlet extends HttpServlet {
 				//
 			} // try
 				//
-			return;
-			//
 		} // if
 			//
 	}
