@@ -202,12 +202,6 @@ class MainServletTest {
 				//
 			} // if
 				//
-			if (!m.isAccessible()) {
-				//
-				m.setAccessible(true);
-				//
-			} // if
-				//
 			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
 			//
 			for (int j = 0; j < parameterTypes.length; j++) {
@@ -234,11 +228,11 @@ class MainServletTest {
 			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				result = invoke(m, null, os);
+				result = Narcissus.invokeStaticMethod(m, os);
 				//
 			} else {
 				//
-				result = invoke(m, instance = ObjectUtils.getIfNull(instance, MainServlet::new), os);
+				result = Narcissus.invokeMethod(instance = ObjectUtils.getIfNull(instance, MainServlet::new), m, os);
 				//
 			} // if
 				//
@@ -304,12 +298,6 @@ class MainServletTest {
 				//
 			} // if
 				//
-			if (!m.isAccessible()) {
-				//
-				m.setAccessible(true);
-				//
-			} // if
-				//
 			clear(collection = ObjectUtils.getIfNull(collection, ArrayList::new));
 			//
 			for (int j = 0; j < parameterTypes.length; j++) {
@@ -361,11 +349,11 @@ class MainServletTest {
 			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
-				result = invoke(m, null, os);
+				result = Narcissus.invokeStaticMethod(m, os);
 				//
 			} else {
 				//
-				result = invoke(m, instance = ObjectUtils.getIfNull(instance, MainServlet::new), os);
+				result = Narcissus.invokeMethod(instance = ObjectUtils.getIfNull(instance, MainServlet::new), m, os);
 				//
 			} // if
 				//
