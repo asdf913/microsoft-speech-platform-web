@@ -1,8 +1,7 @@
-# jetty-servlet-sample
+# Microsoft Speech Platform Web
 
 ## Build
 `mvn clean package`
 
 ## Run
-`java -jar jetty-servlet-sample-0.0.1-SNAPSHOT.jar`
-"# microsoft-speech-platform-web" 
+`java -jar microsoft-speech-platform-web-0.0.1-SNAPSHOT.jar`
