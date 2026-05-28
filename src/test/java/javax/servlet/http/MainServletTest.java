@@ -81,14 +81,10 @@ class MainServletTest {
 					//
 				} // if
 					//
-			} else if (proxy instanceof ServletRequest) {
+			} else if (proxy instanceof ServletRequest && Objects.equals(name, "getParameter")) {
 				//
-				if (Objects.equals(name, "getParameter")) {
-					//
-					return null;
-					//
-				} // if
-					//
+				return null;
+				//
 			} // if
 				//
 			if (proxy instanceof Member && Objects.equals(name, "getName")) {
@@ -115,14 +111,10 @@ class MainServletTest {
 					//
 				} // if
 					//
-			} else if (proxy instanceof HttpServletRequest) {
+			} else if (proxy instanceof HttpServletRequest && Objects.equals(name, "getServletPath")) {
 				//
-				if (Objects.equals(name, "getServletPath")) {
-					//
-					return servletPath;
-					//
-				} // if
-					//
+				return servletPath;
+				//
 			} // if
 				//
 			throw new Throwable(name);
