@@ -449,6 +449,14 @@ class MainServletTest {
 		//
 		if (ih != null) {
 			//
+			ih.servletPath = "/getVoiceAttribute";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
 			ih.servletPath = "";
 			//
 		} // if
