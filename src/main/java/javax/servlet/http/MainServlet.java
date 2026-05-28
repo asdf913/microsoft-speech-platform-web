@@ -117,8 +117,8 @@ public class MainServlet extends HttpServlet {
 				//
 				int[] ints = toIntArray(text);
 				//
-				final String absolutePath = getAbsolutePath(
-						file = File.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null));
+				final String absolutePath = getAbsolutePath(file = File
+						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File(".")));
 				//
 				if (ints != null) {
 					//
