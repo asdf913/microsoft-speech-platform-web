@@ -44,8 +44,6 @@ public class MainServlet extends HttpServlet {
 
 	private interface Jna extends Library {
 
-		Jna INSTANCE = cast(Jna.class, Native.load("MicrosoftSpeechApi.dll", Jna.class));
-
 		public boolean isInstalled();
 
 		public void speak(final int[] text, final int length, final String voiceId, final int rate, final int volume);
@@ -80,12 +78,12 @@ public class MainServlet extends HttpServlet {
 						m -> m != null && Objects.equals("/" + getName(m), servletPath) && m.getParameterCount() == 0),
 				Collectors.toList());
 		//
-		final Jna jna = Jna.INSTANCE;
+		final Jna jna = cast(Jna.class,
+				Objects.equals(getName(getClass(FileSystems.getDefault())), "sun.nio.fs.WindowsFileSystem")
+						? Native.load("MicrosoftSpeechApi.dll", Jna.class)
+						: null);
 		//
-		final boolean isWindows = Objects.equals(getName(getClass(FileSystems.getDefault())),
-				"sun.nio.fs.WindowsFileSystem");
-		//
-		if (IterableUtils.size(ms) == 1 && jna != null && isWindows) {
+		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
 			final Method method = IterableUtils.get(ms, 0);
 			//
@@ -103,7 +101,7 @@ public class MainServlet extends HttpServlet {
 			//
 		} // if
 			//
-		if (Objects.equals(servletPath, "/getVoiceIds") && jna != null && isWindows) {
+		if (Objects.equals(servletPath, "/getVoiceIds") && jna != null) {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
@@ -113,7 +111,7 @@ public class MainServlet extends HttpServlet {
 				//
 			return;
 			//
-		} else if (Objects.equals(servletPath, "/wav") && jna != null && isWindows) {
+		} else if (Objects.equals(servletPath, "/wav") && jna != null) {
 			//
 			File file = null;
 			//
