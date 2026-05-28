@@ -19,10 +19,22 @@ public class Main {
 		//
 		server.setHandler(servletContextHandler);
 		//
-		server.start();
-		//
-		server.join();
-		//
+		if (!isTestMode()) {
+			//
+			server.start();
+			//
+			server.join();
+			//
+		} // if
+			//
+	}
+
+	private static boolean isTestMode() {
+		try {
+			return Class.forName("org.testng.annotations.Test") != null;
+		} catch (final ClassNotFoundException e) {
+			return false;
+		}
 	}
 
 }
