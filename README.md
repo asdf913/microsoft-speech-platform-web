@@ -44,6 +44,47 @@
 </table>
 
 ## URL
-
-### Text to Speech (Wave Format)
-http://127.0.0.:8080/wav?text=日本語
+<table>
+  <tbody>
+    <tr>
+      <td>Text to Speech</td>
+      <td>http://127.0.0.:8080/wav?text=日本語</td>
+    </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>URL</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IsInstalled</td>
+      <td>http://127.0.0.1:8080/isInstalled</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>Provider&nbsp;Name</td>
+      <td>http://127.0.0.1:8080/getProviderName</td>
+      <td>Microsoft Speech Object Library</td>
+    </tr>
+    <tr>
+      <td>Provider&nbsp;Version</td>
+      <td>http://127.0.0.1:8080/getProviderVersion</td>
+      <td>11.0.14405.00</td>
+    </tr>
+    <tr>
+      <td>Provider&nbsp;Platform</td>
+      <td>http://127.0.0.1:8080/getProviderPlatform</td>
+      <td>win64</td>
+    </tr>
+    <tr>
+      <td>Voice&nbsp;IDS</td>
+      <td>http://127.0.0.1:8080/getVoiceIds</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
