@@ -16,6 +16,20 @@
 
 [Java SE 8 Archive Downloads (JDK 8u202 and earlier)](https://www.oracle.com/jp/java/technologies/javase/javase8-archive-downloads.html)
 
+# Development Tool Required
+<table>
+  <tbody>
+    <tr>
+      <td>Eclipse&nbsp;Oxygen</td>
+      <td>https://www.eclipse.org/downloads/packages/release/oxygen/r</td>
+    </tr>
+    <tr>
+      <td>TestNG&nbsp;for&nbsp;Eclipse </td>
+      <td>https://testng.org/testng-eclipse-update-site/zipped/6.14.3.201902250526/org.testng.eclipse.updatesite.zip</td>
+    </tr>
+  </tbody>
+</table>
+
 ## URL
 
 ### Text to Speech (Wave Format)
