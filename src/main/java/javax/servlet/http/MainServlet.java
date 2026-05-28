@@ -27,6 +27,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,8 +127,12 @@ public class MainServlet extends HttpServlet {
 				//
 				if (ints != null) {
 					//
-					jna.writeVoiceToFile(ints, length(ints), getParameter(request, "voiceId"), 0, 100,
-							ints = toIntArray(absolutePath), length(ints));
+					jna.writeVoiceToFile(ints, length(ints), getParameter(request, "voiceId")
+					//
+							, NumberUtils.toInt(getParameter(request, "rate"), 0) // rate
+							, NumberUtils.toInt(getParameter(request, "volume"), 100) // volume
+							//
+							, ints = toIntArray(absolutePath), length(ints));
 					//
 				} // if
 					//
