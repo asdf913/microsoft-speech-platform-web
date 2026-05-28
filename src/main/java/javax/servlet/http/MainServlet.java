@@ -3,7 +3,6 @@ package javax.servlet.http;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -13,7 +12,6 @@ import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -198,32 +196,8 @@ public class MainServlet extends HttpServlet {
 						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
-		testAncAccept(x -> !isAccessible(x), value, x -> setAccessible(x, true));
-		//
 		return value == null || Narcissus.getField(instance, value) != null ? instance.getBytes() : null;
 		//
-	}
-
-	private static void setAccessible(final AccessibleObject instance, final boolean flag) {
-		if (instance != null) {
-			instance.setAccessible(flag);
-		}
-	}
-
-	private static boolean isAccessible(final AccessibleObject instance) {
-		return instance != null && instance.isAccessible();
-	}
-
-	private static <T> void testAncAccept(final Predicate<T> predicate, final T value, final Consumer<T> consumer) {
-		if (test(predicate, value)) {
-			accept(consumer, value);
-		}
-	}
-
-	private static <T> void accept(final Consumer<T> consumer, final T value) {
-		if (consumer != null) {
-			consumer.accept(value);
-		}
 	}
 
 	private static <T> boolean test(final Predicate<T> predicate, final T value) {
@@ -250,8 +224,6 @@ public class MainServlet extends HttpServlet {
 				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(text))),
 						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
-		//
-		testAncAccept(x -> !isAccessible(x), value, x -> setAccessible(x, true));
 		//
 		final char[] cs = value == null || Narcissus.getField(text, value) != null ? text.toCharArray() : null;
 		//
