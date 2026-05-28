@@ -15,3 +15,8 @@
 [Download .NET Framework 4.5.1](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net451)
 
 [Java SE 8 Archive Downloads (JDK 8u202 and earlier)](https://www.oracle.com/jp/java/technologies/javase/javase8-archive-downloads.html)
+
+## URL
+
+### Text to Speech (Wave Format)
+http://127.0.0.:8080/wav?text=日本語
