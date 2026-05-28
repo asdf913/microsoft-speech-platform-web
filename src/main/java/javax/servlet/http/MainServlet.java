@@ -146,8 +146,12 @@ public class MainServlet extends HttpServlet {
 				//
 			} finally {
 				//
-				FileUtils.delete(file);
-				//
+				if (file != null) {
+					//
+					FileUtils.delete(file);
+					//
+				} // if
+					//
 			} // try
 				//
 		} // if
