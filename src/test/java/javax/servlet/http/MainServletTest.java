@@ -25,11 +25,13 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.function.FailableConsumer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import com.google.common.base.Predicates;
 import com.google.common.reflect.Reflection;
 
 import io.github.toolfactory.narcissus.Narcissus;
@@ -39,7 +41,7 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
-	private static Method METHOD_CAST, METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT = null;
+	private static Method METHOD_CAST, METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -53,6 +55,11 @@ class MainServletTest {
 		(METHOD_TO_INT_ARRAY = clz.getDeclaredMethod("toIntArray", String.class)).setAccessible(true);
 		//
 		(METHOD_COLLECT = clz.getDeclaredMethod("collect", Stream.class, Collector.class)).setAccessible(true);
+		//
+		(METHOD_COLLECT = clz.getDeclaredMethod("collect", Stream.class, Collector.class)).setAccessible(true);
+		//
+		(METHOD_TEST_AND_ACCEPT = clz.getDeclaredMethod("testAndAccept", Predicate.class, Object.class,
+				FailableConsumer.class)).setAccessible(true);
 		//
 	}
 
@@ -480,6 +487,13 @@ class MainServletTest {
 		//
 		Assert.assertNull(invoke(METHOD_COLLECT, null,
 				Reflection.newProxy(Stream.class, ih = ObjectUtils.getIfNull(ih, IH::new)), null));
+		//
+	}
+
+	@Test
+	public void testTestAndAccept() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, Predicates.alwaysTrue(), null, null));
 		//
 	}
 

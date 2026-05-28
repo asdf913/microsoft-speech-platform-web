@@ -27,6 +27,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -146,16 +147,19 @@ public class MainServlet extends HttpServlet {
 				//
 			} finally {
 				//
-				if (file != null) {
-					//
-					FileUtils.delete(file);
-					//
-				} // if
-					//
+				testAndAccept(Objects::nonNull, file, FileUtils::delete);
+				//
 			} // try
 				//
 		} // if
 			//
+	}
+
+	private static <T, E extends Throwable> void testAndAccept(final Predicate<T> predicate, final T value,
+			final FailableConsumer<T, E> consumer) throws E {
+		if (test(predicate, value) && consumer != null) {
+			consumer.accept(value);
+		}
 	}
 
 	private static String getServletPath(final HttpServletRequest instance) {
