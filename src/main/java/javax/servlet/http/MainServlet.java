@@ -183,8 +183,8 @@ public class MainServlet extends HttpServlet {
 					//
 			} // try
 				//
-		} else if (servletPath != null && servletPath.startsWith("/") && servletPath.endsWith(".wav")
-				&& StringUtils.length(servletPath) > 5 && jna != null) {
+		} else if (startsWith(servletPath, "/") && endsWith(servletPath, ".wav") && StringUtils.length(servletPath) > 5
+				&& jna != null) {
 			//
 			File file = null;
 			//
@@ -222,6 +222,44 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static boolean startsWith(final String a, final String b) {
+		//
+		if (a == null || b == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
+				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(a))),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
+				x -> IterableUtils.get(x, 0), null);
+		//
+		return value == null
+				|| Boolean.logicalAnd(Narcissus.getField(a, value) != null, Narcissus.getField(b, value) != null)
+						&& a.startsWith(b);
+		//
+	}
+
+	private static boolean endsWith(final String a, final String b) {
+		//
+		if (a == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
+				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(a))),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
+				x -> IterableUtils.get(x, 0), null);
+		//
+		return value == null
+				|| Boolean.logicalAnd(Narcissus.getField(a, value) != null, Narcissus.getField(b, value) != null)
+						&& a.endsWith(b);
+		//
 	}
 
 	private static <T, U> boolean testAndTest(final boolean condition, final BiPredicate<T, U> predicate, final T t,

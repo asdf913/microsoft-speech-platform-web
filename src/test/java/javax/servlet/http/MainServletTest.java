@@ -48,7 +48,7 @@ import javassist.util.proxy.ProxyObject;
 class MainServletTest {
 
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
-			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST = null;
+			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -72,6 +72,10 @@ class MainServletTest {
 		//
 		(METHOD_TEST_AND_TEST = clz.getDeclaredMethod("testAndTest", Boolean.TYPE, BiPredicate.class, Object.class,
 				Object.class)).setAccessible(true);
+		//
+		(METHOD_STARTS_WITH = clz.getDeclaredMethod("startsWith", String.class, String.class)).setAccessible(true);
+		//
+		(METHOD_ENDS_WITH = clz.getDeclaredMethod("endsWith", String.class, String.class)).setAccessible(true);
 		//
 	}
 
@@ -625,6 +629,22 @@ class MainServletTest {
 			//
 		Assert.assertEquals(invoke(METHOD_TEST_AND_TEST, null, Boolean.TRUE, biPredicate, null, null),
 				ih != null ? ih.test : null);
+		//
+	}
+
+	@Test
+	void testStartsWith() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_STARTS_WITH, null, "", Narcissus.allocateInstance(String.class)),
+				Boolean.FALSE);
+		//
+	}
+
+	@Test
+	void testEndsWith() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_ENDS_WITH, null, "", Narcissus.allocateInstance(String.class)),
+				Boolean.FALSE);
 		//
 	}
 
