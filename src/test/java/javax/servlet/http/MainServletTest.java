@@ -474,7 +474,7 @@ class MainServletTest {
 	}
 
 	@Test
-	void testDoGet() throws ClassNotFoundException, ServletException, IOException {
+	void testDoGet() throws ServletException, IOException {
 		//
 		if (instance == null) {
 			//
@@ -678,7 +678,7 @@ class MainServletTest {
 	}
 
 	@Test
-	void testJna() throws ClassNotFoundException {
+	void testJna() {
 		//
 		final Method[] ms = CLASS_JNA != null ? CLASS_JNA.getDeclaredMethods() : null;
 		//
