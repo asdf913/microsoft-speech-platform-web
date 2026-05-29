@@ -69,6 +69,11 @@ public class MainServlet extends HttpServlet {
 
 		public String getProviderPlatform();
 
+		static String getVoiceIds(final Jna instance, final String requiredAttributes,
+				final String optionalAttributes) {
+			return instance != null ? instance.getVoiceIds(requiredAttributes, optionalAttributes) : null;
+		}
+
 	}
 
 	@Override
@@ -104,13 +109,14 @@ public class MainServlet extends HttpServlet {
 			//
 		} // if
 			//
-		if (Objects.equals(servletPath, "/getVoiceIds") && jna != null) {
+		if (Objects.equals(servletPath, "/getVoiceIds")) {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
 				setContentType(response, "application/json");
 				//
-				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(jna.getVoiceIds(null, null), ",")));
+				write(os,
+						new ObjectMapper().writeValueAsBytes(StringUtils.split(Jna.getVoiceIds(jna, null, null), ",")));
 				//
 			} // try
 				//
