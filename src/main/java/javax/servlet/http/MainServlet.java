@@ -51,6 +51,8 @@ public class MainServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -5176135849319893425L;
 
+	private static final String VALUE = "value";
+
 	private interface Jna extends Library {
 
 		public boolean isInstalled();
@@ -283,7 +285,7 @@ public class MainServlet extends HttpServlet {
 			//
 			final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
 					collect(filter(stream(FieldUtils.getAllFieldsList(getClass(parameter))),
-							f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+							f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 					x -> IterableUtils.get(x, 0), null);
 			//
 			if (value != null && Narcissus.getField(parameter, value) == null) {
@@ -326,7 +328,7 @@ public class MainServlet extends HttpServlet {
 			//
 		final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
 				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(instance))),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
 		return value == null || Narcissus.getField(instance, value) != null ? instance.getBytes() : null;
@@ -363,7 +365,7 @@ public class MainServlet extends HttpServlet {
 			//
 		final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
 				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(text))),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
 		final char[] cs = !isTestMode() || value == null || Narcissus.getField(text, value) != null ? text.toCharArray()
