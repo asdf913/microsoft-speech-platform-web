@@ -192,8 +192,20 @@ public class MainServlet extends HttpServlet {
 					//
 			} // try
 				//
-		} else if (and(startsWith(servletPath, "/"), endsWith(servletPath, ".wav"),
-				StringUtils.length(servletPath) > 5)) {
+			return;
+			//
+		} // if
+			//
+		write(request, response, jna);
+		//
+	}
+
+	private static void write(final HttpServletRequest request, final ServletResponse response, final Jna jna)
+			throws IOException {
+		//
+		final String servletPath = getServletPath(request);
+		//
+		if (and(startsWith(servletPath, "/"), endsWith(servletPath, ".wav"), StringUtils.length(servletPath) > 5)) {
 			//
 			File file = null;
 			//
@@ -230,7 +242,6 @@ public class MainServlet extends HttpServlet {
 			} // try
 				//
 		} // if
-			//
 	}
 
 	private static IValue0<Object> getIValue0(final String servletPath, final Jna jna)
