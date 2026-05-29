@@ -74,6 +74,10 @@ public class MainServlet extends HttpServlet {
 			return instance != null ? instance.getVoiceIds(requiredAttributes, optionalAttributes) : null;
 		}
 
+		static String getVoiceAttribute(final Jna instance, final String voiceId, final String attribute) {
+			return instance != null ? instance.getVoiceAttribute(voiceId, attribute) : null;
+		}
+
 	}
 
 	@Override
@@ -120,16 +124,15 @@ public class MainServlet extends HttpServlet {
 				//
 			} // try
 				//
-		} else if (Objects.equals(servletPath, "/getVoiceAttribute") && jna != null) {
+		} else if (Objects.equals(servletPath, "/getVoiceAttribute")) {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
 				setContentType(response, "application/json");
 				//
-				write(os,
-						new ObjectMapper().writeValueAsBytes(StringUtils.split(
-								jna.getVoiceAttribute(getParameter(request, "id"), getParameter(request, "attribute")),
-								",")));
+				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(
+						Jna.getVoiceAttribute(jna, getParameter(request, "id"), getParameter(request, "attribute")),
+						",")));
 				//
 			} // try
 				//
