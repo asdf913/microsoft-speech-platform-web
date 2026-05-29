@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Predicates;
+import com.google.common.base.Suppliers;
 import com.google.common.reflect.Reflection;
 
 import io.github.toolfactory.narcissus.Narcissus;
@@ -44,7 +46,8 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
-	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST = null;
+	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
+			METHOD_TEST_AND_GET = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -63,6 +66,8 @@ class MainServletTest {
 				FailableConsumer.class)).setAccessible(true);
 		//
 		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
+		//
+		(METHOD_TEST_AND_GET = clz.getDeclaredMethod("testAndGet", Boolean.TYPE, Supplier.class)).setAccessible(true);
 		//
 	}
 
@@ -560,6 +565,17 @@ class MainServletTest {
 	public void testTestAndAccept() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, Predicates.alwaysTrue(), null, null));
+		//
+	}
+
+	@Test
+	public void testTestAndGet() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertNull(invoke(METHOD_TEST_AND_GET, null, Boolean.TRUE, null));
+		//
+		final Object object = new Object();
+		//
+		Assert.assertSame(invoke(METHOD_TEST_AND_GET, null, Boolean.TRUE, Suppliers.ofInstance(object)), object);
 		//
 	}
 

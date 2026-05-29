@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,7 +84,7 @@ public class MainServlet extends HttpServlet {
 		final boolean isWindows = Objects.equals(getName(getClass(FileSystems.getDefault())),
 				"sun.nio.fs.WindowsFileSystem");
 		//
-		final Jna jna = isWindows ? Native.load("MicrosoftSpeechApi.dll", Jna.class) : null;
+		final Jna jna = testAndGet(isWindows, () -> Native.load("MicrosoftSpeechApi.dll", Jna.class));
 		//
 		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
@@ -214,6 +215,10 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static <T> T testAndGet(final boolean condition, final Supplier<T> supplier) {
+		return condition && supplier != null ? supplier.get() : null;
 	}
 
 	private static <T> T cast(final Class<T> clz, final Object value) {
