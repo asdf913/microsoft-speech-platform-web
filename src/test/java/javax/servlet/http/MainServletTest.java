@@ -670,7 +670,7 @@ class MainServletTest {
 			//
 			for (int j = 0; j < parameterTypes.length; j++) {
 				//
-				if (Objects.equals(parameterType = ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
+				if (Objects.equals(ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
 					//
 					add(collection, Integer.valueOf(0));
 					//
