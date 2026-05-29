@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -47,7 +48,7 @@ import javassist.util.proxy.ProxyObject;
 class MainServletTest {
 
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
-			METHOD_TEST_AND_GET = null;
+			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -68,6 +69,9 @@ class MainServletTest {
 		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
 		//
 		(METHOD_TEST_AND_GET = clz.getDeclaredMethod("testAndGet", Boolean.TYPE, Supplier.class)).setAccessible(true);
+		//
+		(METHOD_TEST_AND_TEST = clz.getDeclaredMethod("testAndTest", Boolean.TYPE, BiPredicate.class, Object.class,
+				Object.class)).setAccessible(true);
 		//
 	}
 
@@ -113,7 +117,8 @@ class MainServletTest {
 				//
 				return null;
 				//
-			} else if (proxy instanceof Predicate && Objects.equals(name, "test")) {
+			} else if (Stream.of(Predicate.class, BiPredicate.class).anyMatch(x -> x != null && x.isInstance(proxy))
+					&& Objects.equals(name, "test")) {
 				//
 				return test;
 				//
@@ -194,7 +199,7 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testCast() throws IllegalAccessException, InvocationTargetException {
+	void testCast() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertNull(cast(Object.class, null));
 		//
@@ -450,7 +455,7 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testDoGet() throws ClassNotFoundException, ServletException, IOException {
+	void testDoGet() throws ClassNotFoundException, ServletException, IOException {
 		//
 		if (instance == null) {
 			//
@@ -546,7 +551,7 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testTest() throws IllegalAccessException, InvocationTargetException {
+	void testTest() throws IllegalAccessException, InvocationTargetException {
 		//
 		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null) {
 			//
@@ -560,7 +565,7 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testToIntArray() throws IllegalAccessException, InvocationTargetException {
+	void testToIntArray() throws IllegalAccessException, InvocationTargetException {
 		//
 		final char c = ' ';
 		//
@@ -569,7 +574,7 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testCollect() throws IllegalAccessException, InvocationTargetException {
+	void testCollect() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertNull(invoke(METHOD_COLLECT, null, Stream.empty(), null));
 		//
@@ -579,14 +584,14 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testTestAndAccept() throws IllegalAccessException, InvocationTargetException {
+	void testTestAndAccept() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertNull(invoke(METHOD_TEST_AND_ACCEPT, null, Predicates.alwaysTrue(), null, null));
 		//
 	}
 
 	@Test
-	public void testTestAndGet() throws IllegalAccessException, InvocationTargetException {
+	void testTestAndGet() throws IllegalAccessException, InvocationTargetException {
 		//
 		Assert.assertNull(invoke(METHOD_TEST_AND_GET, null, Boolean.TRUE, null));
 		//
@@ -597,7 +602,34 @@ class MainServletTest {
 	}
 
 	@Test
-	public void testJna() throws ClassNotFoundException {
+	void testTestAndTest() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_TEST_AND_TEST, null, Boolean.TRUE, null, null, null), Boolean.FALSE);
+		//
+		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null) {
+			//
+			ih.test = Boolean.FALSE;
+			//
+		} // if
+			//
+		final BiPredicate<?, ?> biPredicate = Reflection.newProxy(BiPredicate.class, ih);
+		//
+		Assert.assertEquals(invoke(METHOD_TEST_AND_TEST, null, Boolean.TRUE, biPredicate, null, null),
+				ih != null ? ih.test : null);
+		//
+		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null) {
+			//
+			ih.test = Boolean.TRUE;
+			//
+		} // if
+			//
+		Assert.assertEquals(invoke(METHOD_TEST_AND_TEST, null, Boolean.TRUE, biPredicate, null, null),
+				ih != null ? ih.test : null);
+		//
+	}
+
+	@Test
+	void testJna() throws ClassNotFoundException {
 		//
 		final Class<?> clz = Class.forName("javax.servlet.http.MainServlet$Jna");
 		//

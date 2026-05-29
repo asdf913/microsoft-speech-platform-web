@@ -13,6 +13,7 @@ import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -161,7 +162,8 @@ public class MainServlet extends HttpServlet {
 									.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))), Collectors.toList()),
 							x -> IterableUtils.get(x, 0), null)) != null) {
 						//
-						registryKeyExists = isWindows && Advapi32Util.registryKeyExists(hkey, key);
+						registryKeyExists = testAndTest(isWindows, (a, b) -> Advapi32Util.registryKeyExists(a, b), hkey,
+								key);
 						//
 					} // if
 						//
@@ -221,6 +223,11 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static <T, U> boolean testAndTest(final boolean condition, final BiPredicate<T, U> predicate, final T t,
+			final U u) {
+		return condition && predicate != null && predicate.test(t, u);
 	}
 
 	private static Class<?> getType(final Field instance) {
