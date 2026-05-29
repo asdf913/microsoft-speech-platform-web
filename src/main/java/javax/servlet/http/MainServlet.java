@@ -80,10 +80,9 @@ public class MainServlet extends HttpServlet {
 				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
 				Collectors.toList());
 		//
-		final Jna jna = cast(Jna.class,
-				Objects.equals(getName(getClass(FileSystems.getDefault())), "sun.nio.fs.WindowsFileSystem")
-						? Native.load("MicrosoftSpeechApi.dll", Jna.class)
-						: null);
+		final Jna jna = Objects.equals(getName(getClass(FileSystems.getDefault())), "sun.nio.fs.WindowsFileSystem")
+				? Native.load("MicrosoftSpeechApi.dll", Jna.class)
+				: null;
 		//
 		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
