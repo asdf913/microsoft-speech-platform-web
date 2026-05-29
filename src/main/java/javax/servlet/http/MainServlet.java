@@ -252,7 +252,7 @@ public class MainServlet extends HttpServlet {
 
 	private static boolean endsWith(final String a, final String b) {
 		//
-		if (a == null) {
+		if (a == null || b == null) {
 			//
 			return false;
 			//
