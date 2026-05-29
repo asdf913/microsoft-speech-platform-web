@@ -167,7 +167,7 @@ public class MainServlet extends HttpServlet {
 						//
 				} // if
 					//
-				if (hkey != null && registryKeyExists) {
+				if (Boolean.logicalAnd(hkey != null, registryKeyExists)) {
 					//
 					final String[] keys = Advapi32Util.registryGetKeys(hkey, key);
 					//
