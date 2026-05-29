@@ -115,6 +115,8 @@ public class MainServlet extends HttpServlet {
 					//
 					write(os, getBytes(Objects.toString(iValue0.getValue0())));
 					//
+					return;
+					//
 				} // try
 					//
 			} // if
@@ -238,8 +240,7 @@ public class MainServlet extends HttpServlet {
 				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
 				Collectors.toList());
 		//
-		if (IterableUtils.size(ms) == 1 
-				&& jna != null) {
+		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
 			final Method method = IterableUtils.get(ms, 0);
 			//
