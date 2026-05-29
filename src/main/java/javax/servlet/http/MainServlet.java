@@ -53,6 +53,8 @@ public class MainServlet extends HttpServlet {
 
 	private static final String VALUE = "value";
 
+	private static final String APPLICATION_JSON = "application/json";
+
 	private interface Jna extends Library {
 
 		public boolean isInstalled();
@@ -120,7 +122,7 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				setContentType(response, "application/json");
+				setContentType(response, APPLICATION_JSON);
 				//
 				write(os,
 						new ObjectMapper().writeValueAsBytes(StringUtils.split(Jna.getVoiceIds(jna, null, null), ",")));
@@ -131,7 +133,7 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				setContentType(response, "application/json");
+				setContentType(response, APPLICATION_JSON);
 				//
 				write(os, new ObjectMapper().writeValueAsBytes(StringUtils.split(
 						Jna.getVoiceAttribute(jna, getParameter(request, "id"), getParameter(request, "attribute")),
@@ -143,7 +145,7 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				setContentType(response, "application/json");
+				setContentType(response, APPLICATION_JSON);
 				//
 				final String id = getParameter(request, "id");
 				//
