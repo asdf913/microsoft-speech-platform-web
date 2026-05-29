@@ -166,8 +166,7 @@ public class MainServlet extends HttpServlet {
 									.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))), Collectors.toList()),
 							x -> IterableUtils.get(x, 0), null)) != null) {
 						//
-						registryKeyExists = testAndTest(isWindows, (a, b) -> Advapi32Util.registryKeyExists(a, b), hkey,
-								key);
+						registryKeyExists = testAndTest(isWindows, Advapi32Util::registryKeyExists, hkey, key);
 						//
 					} // if
 						//
