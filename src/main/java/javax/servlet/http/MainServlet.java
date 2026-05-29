@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
@@ -38,6 +39,9 @@ import com.j256.simplemagic.ContentInfoUtil;
 import com.j256.simplemagic.ContentType;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
+import com.sun.jna.platform.win32.WinReg.HKEY;
 
 import io.github.toolfactory.narcissus.Narcissus;
 
@@ -121,6 +125,53 @@ public class MainServlet extends HttpServlet {
 				//
 			} // try
 				//
+		} else if (Objects.equals(servletPath, "/getVoiceAttributes")) {
+			//
+			try (final OutputStream os = getOutputStream(response)) {
+				//
+				setContentType(response, "application/json");
+				//
+				final String id = getParameter(request, "id");
+				//
+				final String[] ss = StringUtils.split(id, '\\');
+				//
+				String key = StringUtils.substringAfter(id, '\\');
+				//
+				boolean registryKeyExists = false;
+				//
+				HKEY hkey = null;
+				//
+				if (ss != null && ss.length > 0) {
+					//
+					if ((hkey = testAndApply(x -> IterableUtils.size(x) == 1, collect(
+							filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
+									f -> f != null && Objects.equals(f.getType(), HKEY.class)
+											&& Objects.equals(getName(f), ArrayUtils.get(ss, 0)))
+													.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))),
+							Collectors.toList()), x -> IterableUtils.get(x, 0), null)) != null) {
+						//
+						registryKeyExists = Advapi32Util.registryKeyExists(hkey, key);
+						//
+					} // if
+						//
+				} // if
+					//
+				if (hkey != null && registryKeyExists) {
+					//
+					final String[] keys = Advapi32Util.registryGetKeys(hkey, key);
+					//
+					if (keys != null && keys.length == 1 && Objects.equals(ArrayUtils.get(keys, 0), "Attributes")
+							&& Advapi32Util.registryKeyExists(hkey,
+									key = String.join("\\", key, ArrayUtils.get(keys, 0)))) {
+						//
+						write(os, new ObjectMapper().writeValueAsBytes(Advapi32Util.registryGetValues(hkey, key)));
+						//
+					} // if
+						//
+				} // if
+					//
+			} // try
+				//
 		} else if (servletPath != null && servletPath.startsWith("/") && servletPath.endsWith(".wav")
 				&& StringUtils.length(servletPath) > 5 && jna != null) {
 			//
@@ -162,6 +213,10 @@ public class MainServlet extends HttpServlet {
 			//
 	}
 
+	private static <T> T cast(final Class<T> clz, final Object value) {
+		return clz != null && clz.isInstance(value) ? clz.cast(value) : null;
+	}
+
 	private static int getParameterCount(final Executable instance) {
 		return instance != null ? instance.getParameterCount() : 0;
 	}
@@ -190,7 +245,32 @@ public class MainServlet extends HttpServlet {
 	}
 
 	private static String getParameter(final ServletRequest instance, final String parameter) {
-		return instance != null ? instance.getParameter(parameter) : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Class<?> clz = getClass(instance);
+		//
+		if (clz != null && Proxy.isProxyClass(clz)) {
+			//
+			final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
+					collect(filter(stream(FieldUtils.getAllFieldsList(getClass(parameter))),
+							f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+					x -> IterableUtils.get(x, 0), null);
+			//
+			if (value != null && Narcissus.getField(parameter, value) == null) {
+				//
+				return null;
+				//
+			} // if
+				//
+		} // if
+			//
+		return instance.getParameter(parameter);
+		//
 	}
 
 	private static ContentType getContentType(final ContentInfo instance) {

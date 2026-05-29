@@ -12,6 +12,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -42,7 +44,7 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
-	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT = null;
+	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -60,6 +62,8 @@ class MainServletTest {
 		(METHOD_TEST_AND_ACCEPT = clz.getDeclaredMethod("testAndAccept", Predicate.class, Object.class,
 				FailableConsumer.class)).setAccessible(true);
 		//
+		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
+		//
 	}
 
 	private static class IH implements InvocationHandler {
@@ -67,6 +71,8 @@ class MainServletTest {
 		private Boolean test;
 
 		private String servletPath;
+
+		private Map<Object, Object> parameters = null;
 
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -87,9 +93,10 @@ class MainServletTest {
 					//
 				} // if
 					//
-			} else if (proxy instanceof ServletRequest && Objects.equals(name, "getParameter")) {
+			} else if (proxy instanceof ServletRequest && Objects.equals(name, "getParameter") && args != null
+					&& args.length > 0) {
 				//
-				return null;
+				return get(parameters = ObjectUtils.getIfNull(parameters, LinkedHashMap::new), ArrayUtils.get(args, 0));
 				//
 			} // if
 				//
@@ -127,6 +134,10 @@ class MainServletTest {
 			//
 		}
 
+		private static <V> V get(final Map<?, V> instance, final Object key) {
+			return instance != null ? instance.get(key) : null;
+		}
+
 	}
 
 	private static class MH implements MethodHandler {
@@ -152,7 +163,7 @@ class MainServletTest {
 	private IH ih = null;
 
 	@BeforeMethod
-	void beforeMethod() throws Throwable {
+	void beforeMethod() throws IllegalAccessException, InvocationTargetException {
 		//
 		instance = cast(MainServlet.class, Narcissus.allocateInstance(MainServlet.class));
 		//
@@ -160,8 +171,16 @@ class MainServletTest {
 		//
 	}
 
-	private static <T> T cast(final Class<T> clz, final Object value) {
-		return clz != null && clz.isInstance(value) ? clz.cast(value) : null;
+	@Test
+	public void testCast() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertNull(cast(Object.class, null));
+		//
+	}
+
+	private static <T> T cast(final Class<T> clz, final Object value)
+			throws IllegalAccessException, InvocationTargetException {
+		return (T) invoke(METHOD_CAST, null, clz, value);
 	}
 
 	private static Object invoke(final Method method, final Object instance, final Object... args)
@@ -443,6 +462,29 @@ class MainServletTest {
 			//
 			ih.servletPath = "/getVoiceAttribute";
 			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
+			ih.servletPath = "/getVoiceAttributes";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		if (ih != null) {
+			//
+			ih.servletPath = "/getVoiceAttributes";
+			//
+			if ((ih.parameters = ObjectUtils.getIfNull(ih.parameters, LinkedHashMap::new)) != null) {
+				//
+				ih.parameters.put("id",
+						"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech Server\\v11.0\\Voices\\Tokens\\TTS_MS_ja-JP_Haruka_11.0");
+				//
+			} // if
+				//
 		} // if
 			//
 		instance.doGet(httpServletRequest, null);
