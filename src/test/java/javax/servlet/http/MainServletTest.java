@@ -48,7 +48,7 @@ import javassist.util.proxy.ProxyObject;
 class MainServletTest {
 
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
-			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH = null;
+			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH, METHOD_AND = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
@@ -76,6 +76,8 @@ class MainServletTest {
 		(METHOD_STARTS_WITH = clz.getDeclaredMethod("startsWith", String.class, String.class)).setAccessible(true);
 		//
 		(METHOD_ENDS_WITH = clz.getDeclaredMethod("endsWith", String.class, String.class)).setAccessible(true);
+		//
+		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, Boolean.TYPE, boolean[].class)).setAccessible(true);
 		//
 	}
 
@@ -241,7 +243,9 @@ class MainServletTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = m.getParameterTypes()) == null
+					|| Boolean.logicalAnd(Objects.equals(getName(m), "and"), Arrays.equals(parameterTypes,
+							new Class<?>[] { Boolean.TYPE, Boolean.TYPE, boolean[].class }))) {
 				//
 				continue;
 				//
@@ -337,7 +341,9 @@ class MainServletTest {
 		for (int i = 0; ms != null && i < ms.length; i++) {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
-					|| (parameterTypes = m.getParameterTypes()) == null) {
+					|| (parameterTypes = m.getParameterTypes()) == null
+					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "and"), Arrays.equals(parameterTypes,
+							new Class<?>[] { Boolean.TYPE, Boolean.TYPE, boolean[].class }))) {
 				//
 				continue;
 				//
@@ -358,6 +364,10 @@ class MainServletTest {
 				} else if (Objects.equals(parameterType, Boolean.TYPE)) {
 					//
 					add(collection, Boolean.FALSE);
+					//
+				} else if (Objects.equals(parameterType, byte[].class)) {
+					//
+					add(collection, new byte[] {});
 					//
 				} else if (Objects.equals(parameterType, Executable.class)) {
 					//
@@ -407,7 +417,7 @@ class MainServletTest {
 			} // if
 				//
 			if (contains(Arrays.asList(Integer.TYPE, Boolean.TYPE), getReturnType(m))
-					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "getClass"),
+					|| Boolean.logicalAnd(Objects.equals(name, "getClass"),
 							Arrays.equals(parameterTypes, new Object[] { Object.class }))
 					|| Boolean.logicalAnd(Objects.equals(name, "getName"),
 							Arrays.equals(parameterTypes, new Object[] { Class.class }))
@@ -645,6 +655,13 @@ class MainServletTest {
 		//
 		Assert.assertEquals(invoke(METHOD_ENDS_WITH, null, "", Narcissus.allocateInstance(String.class)),
 				Boolean.FALSE);
+		//
+	}
+
+	@Test
+	void testAnd() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_AND, null, Boolean.TRUE, Boolean.TRUE, null), Boolean.TRUE);
 		//
 	}
 

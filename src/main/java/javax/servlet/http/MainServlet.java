@@ -190,8 +190,8 @@ public class MainServlet extends HttpServlet {
 					//
 			} // try
 				//
-		} else if (startsWith(servletPath, "/") && endsWith(servletPath, ".wav")
-				&& StringUtils.length(servletPath) > 5) {
+		} else if (and(startsWith(servletPath, "/"), endsWith(servletPath, ".wav"),
+				StringUtils.length(servletPath) > 5)) {
 			//
 			File file = null;
 			//
@@ -229,6 +229,30 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static boolean and(final boolean a, final boolean b, final boolean... bs) {
+		//
+		boolean result = a && b;
+		//
+		if (!result) {
+			//
+			return false;
+			//
+		} // if
+			//
+		for (int i = 0; bs != null && i < bs.length; i++) {
+			//
+			if (!(result &= bs[i])) {
+				//
+				return false;
+				//
+			} // if
+				//
+		} // for
+			//
+		return result;
+		//
 	}
 
 	private static boolean startsWith(final String a, final String b) {
