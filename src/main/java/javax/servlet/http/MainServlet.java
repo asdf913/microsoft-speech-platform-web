@@ -157,7 +157,7 @@ public class MainServlet extends HttpServlet {
 					if ((hkey = testAndApply(
 							x -> IterableUtils.size(x) == 1, collect(
 									filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
-											f -> f != null && Objects.equals(f.getType(), HKEY.class)
+											f -> Objects.equals(getType(f), HKEY.class)
 													&& Objects.equals(getName(f), ArrayUtils.get(ss, 0)))
 											.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))),
 									Collectors.toList()),
@@ -223,6 +223,10 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static Class<?> getType(final Field instance) {
+		return instance != null ? instance.getType() : null;
 	}
 
 	private static <T> T testAndGet(final boolean condition, final Supplier<T> supplier) {
