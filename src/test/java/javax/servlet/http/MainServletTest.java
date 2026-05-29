@@ -42,14 +42,12 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
-	private static Method METHOD_CAST, METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT = null;
+	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException {
 		//
 		final Class<?> clz = MainServlet.class;
-		//
-		(METHOD_CAST = clz.getDeclaredMethod("cast", Class.class, Object.class)).setAccessible(true);
 		//
 		(METHOD_TEST = clz.getDeclaredMethod("test", Predicate.class, Object.class)).setAccessible(true);
 		//
@@ -162,19 +160,8 @@ class MainServletTest {
 		//
 	}
 
-	@Test
-	public void testCast() throws Throwable {
-		//
-		Assert.assertNull(cast(Object.class, null));
-		//
-	}
-
-	private static <T> T cast(final Class<T> clz, final Object value) throws Throwable {
-		try {
-			return (T) invoke(METHOD_CAST, null, clz, value);
-		} catch (final InvocationTargetException e) {
-			throw e.getTargetException();
-		}
+	private static <T> T cast(final Class<T> clz, final Object value) {
+		return clz != null && clz.isInstance(value) ? clz.cast(value) : null;
 	}
 
 	private static Object invoke(final Method method, final Object instance, final Object... args)

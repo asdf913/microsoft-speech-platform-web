@@ -66,10 +66,6 @@ public class MainServlet extends HttpServlet {
 
 	}
 
-	private static <T> T cast(final Class<T> clz, final Object value) {
-		return clz != null && clz.isInstance(value) ? clz.cast(value) : null;
-	}
-
 	@Override
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
