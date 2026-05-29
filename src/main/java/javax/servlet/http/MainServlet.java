@@ -80,9 +80,10 @@ public class MainServlet extends HttpServlet {
 				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
 				Collectors.toList());
 		//
-		final Jna jna = Objects.equals(getName(getClass(FileSystems.getDefault())), "sun.nio.fs.WindowsFileSystem")
-				? Native.load("MicrosoftSpeechApi.dll", Jna.class)
-				: null;
+		final boolean isWindows = Objects.equals(getName(getClass(FileSystems.getDefault())),
+				"sun.nio.fs.WindowsFileSystem");
+		//
+		final Jna jna = isWindows ? Native.load("MicrosoftSpeechApi.dll", Jna.class) : null;
 		//
 		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
@@ -143,14 +144,16 @@ public class MainServlet extends HttpServlet {
 				//
 				if (ss != null && ss.length > 0) {
 					//
-					if ((hkey = testAndApply(x -> IterableUtils.size(x) == 1, collect(
-							filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
-									f -> f != null && Objects.equals(f.getType(), HKEY.class)
-											&& Objects.equals(getName(f), ArrayUtils.get(ss, 0)))
-													.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))),
-							Collectors.toList()), x -> IterableUtils.get(x, 0), null)) != null) {
+					if ((hkey = testAndApply(
+							x -> IterableUtils.size(x) == 1, collect(
+									filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
+											f -> f != null && Objects.equals(f.getType(), HKEY.class)
+													&& Objects.equals(getName(f), ArrayUtils.get(ss, 0)))
+											.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))),
+									Collectors.toList()),
+							x -> IterableUtils.get(x, 0), null)) != null) {
 						//
-						registryKeyExists = Advapi32Util.registryKeyExists(hkey, key);
+						registryKeyExists = isWindows && Advapi32Util.registryKeyExists(hkey, key);
 						//
 					} // if
 						//
