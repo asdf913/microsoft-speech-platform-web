@@ -152,7 +152,7 @@ public class MainServlet extends HttpServlet {
 				//
 				HKEY hkey = null;
 				//
-				if (ss != null && ss.length > 0) {
+				if (length(ss) > 0) {
 					//
 					if ((hkey = testAndApply(
 							x -> IterableUtils.size(x) == 1, collect(
@@ -173,9 +173,8 @@ public class MainServlet extends HttpServlet {
 					//
 					final String[] keys = Advapi32Util.registryGetKeys(hkey, key);
 					//
-					if (keys != null && keys.length == 1 && Objects.equals(ArrayUtils.get(keys, 0), "Attributes")
-							&& Advapi32Util.registryKeyExists(hkey,
-									key = String.join("\\", key, ArrayUtils.get(keys, 0)))) {
+					if (length(keys) == 1 && Objects.equals(ArrayUtils.get(keys, 0), "Attributes") && Advapi32Util
+							.registryKeyExists(hkey, key = String.join("\\", key, ArrayUtils.get(keys, 0)))) {
 						//
 						write(os, new ObjectMapper().writeValueAsBytes(Advapi32Util.registryGetValues(hkey, key)));
 						//
@@ -338,6 +337,10 @@ public class MainServlet extends HttpServlet {
 	}
 
 	private static int length(final int[] instance) {
+		return instance != null ? instance.length : 0;
+	}
+
+	private static int length(final Object[] instance) {
 		return instance != null ? instance.length : 0;
 	}
 
