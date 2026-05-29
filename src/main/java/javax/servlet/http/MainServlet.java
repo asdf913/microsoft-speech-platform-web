@@ -83,6 +83,13 @@ public class MainServlet extends HttpServlet {
 			return instance != null ? instance.getVoiceAttribute(voiceId, attribute) : null;
 		}
 
+		static void writeVoiceToFile(final Jna instance, final int[] text, final int textLength, final String voiceId,
+				final int rate, final int volume, final int[] fileName, final int fileNameLength) {
+			if (instance != null) {
+				instance.writeVoiceToFile(text, textLength, voiceId, rate, volume, fileName, fileNameLength);
+			}
+		}
+
 	}
 
 	@Override
@@ -183,8 +190,8 @@ public class MainServlet extends HttpServlet {
 					//
 			} // try
 				//
-		} else if (startsWith(servletPath, "/") && endsWith(servletPath, ".wav") && StringUtils.length(servletPath) > 5
-				&& jna != null) {
+		} else if (startsWith(servletPath, "/") && endsWith(servletPath, ".wav")
+				&& StringUtils.length(servletPath) > 5) {
 			//
 			File file = null;
 			//
@@ -197,7 +204,7 @@ public class MainServlet extends HttpServlet {
 				//
 				if (ints != null) {
 					//
-					jna.writeVoiceToFile(ints, length(ints), getParameter(request, "voiceId")
+					Jna.writeVoiceToFile(jna, ints, length(ints), getParameter(request, "voiceId")
 					//
 							, NumberUtils.toInt(getParameter(request, "rate"), 0) // rate
 							, NumberUtils.toInt(getParameter(request, "volume"), 100) // volume

@@ -731,6 +731,10 @@ class MainServletTest {
 					Arrays.equals(parameterTypes,
 							new Class<?>[] { int[].class, Integer.TYPE, String.class, Integer.TYPE, Integer.TYPE,
 									int[].class, Integer.TYPE }))
+					|| Boolean.logicalAnd(Objects.equals(name, "writeVoiceToFile"),
+							Arrays.equals(parameterTypes,
+									new Class<?>[] { clz, int[].class, Integer.TYPE, String.class, Integer.TYPE,
+											Integer.TYPE, int[].class, Integer.TYPE }))
 					|| Boolean.logicalAnd(Objects.equals(name, "speak"), Arrays.equals(parameterTypes,
 							new Class<?>[] { int[].class, Integer.TYPE, String.class, Integer.TYPE, Integer.TYPE }))) {
 				//
@@ -742,17 +746,9 @@ class MainServletTest {
 			//
 			for (int j = 0; j < parameterTypes.length; j++) {
 				//
-				if (Objects.equals(parameterType = ArrayUtils.get(parameterTypes, j), Integer.TYPE)) {
-					//
-					add(collection, Integer.valueOf(0));
-					//
-				} else if (parameterType != null && parameterType.isInterface()) {
+				if ((parameterType = ArrayUtils.get(parameterTypes, j)) != null && parameterType.isInterface()) {
 					//
 					add(collection, Reflection.newProxy(parameterType, ih));
-					//
-				} else if (parameterType != null && parameterType.isArray()) {
-					//
-					add(collection, Array.newInstance(parameterType, 0));
 					//
 				} else {
 					//
