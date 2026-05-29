@@ -31,6 +31,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
+import org.javatuples.Unit;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -47,11 +48,14 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
+	private static Class<?> CLASS_JNA = null;
+
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
-			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH, METHOD_AND = null;
+			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH, METHOD_AND,
+			METHOD_GET_IVALUE0 = null;
 
 	@BeforeSuite
-	void beforeSuite() throws NoSuchMethodException {
+	void beforeSuite() throws NoSuchMethodException, ClassNotFoundException {
 		//
 		final Class<?> clz = MainServlet.class;
 		//
@@ -78,6 +82,9 @@ class MainServletTest {
 		(METHOD_ENDS_WITH = clz.getDeclaredMethod("endsWith", String.class, String.class)).setAccessible(true);
 		//
 		(METHOD_AND = clz.getDeclaredMethod("and", Boolean.TYPE, Boolean.TYPE, boolean[].class)).setAccessible(true);
+		//
+		(METHOD_GET_IVALUE0 = clz.getDeclaredMethod("getIValue0", String.class,
+				CLASS_JNA = Class.forName("javax.servlet.http.MainServlet$Jna"))).setAccessible(true);
 		//
 	}
 
@@ -144,8 +151,7 @@ class MainServletTest {
 				//
 				return servletPath;
 				//
-			} else if (Objects.equals(method != null ? getName(method.getDeclaringClass()) : null,
-					"javax.servlet.http.MainServlet$Jna")) {
+			} else if (Objects.equals(method != null ? method.getDeclaringClass() : null, CLASS_JNA)) {
 				//
 				if (Objects.equals(getReturnType(method), String.class)) {
 					//
@@ -161,10 +167,6 @@ class MainServletTest {
 				//
 			throw new Throwable(name);
 			//
-		}
-
-		private static String getName(final Class<?> instance) {
-			return instance != null ? instance.getName() : null;
 		}
 
 		private static <V> V get(final Map<?, V> instance, final Object key) {
@@ -342,8 +344,11 @@ class MainServletTest {
 			//
 			if ((m = ArrayUtils.get(ms, i)) == null || m.isSynthetic()
 					|| (parameterTypes = m.getParameterTypes()) == null
-					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "and"), Arrays.equals(parameterTypes,
-							new Class<?>[] { Boolean.TYPE, Boolean.TYPE, boolean[].class }))) {
+					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "and"),
+							Arrays.equals(parameterTypes,
+									new Class<?>[] { Boolean.TYPE, Boolean.TYPE, boolean[].class }))
+					|| Boolean.logicalAnd(Objects.equals(name, "getIValue0"),
+							Arrays.equals(parameterTypes, new Class<?>[] { String.class, CLASS_JNA }))) {
 				//
 				continue;
 				//
@@ -477,8 +482,7 @@ class MainServletTest {
 			//
 		} // if
 			//
-		final Iterable<Method> ms = Arrays
-				.stream(Class.forName("javax.servlet.http.MainServlet$Jna").getDeclaredMethods())
+		final Iterable<Method> ms = Arrays.stream(CLASS_JNA != null ? CLASS_JNA.getDeclaredMethods() : null)
 				.filter(m -> m != null && m.getParameterCount() == 0).collect(Collectors.toList());
 		//
 		if ((ih = ObjectUtils.getIfNull(ih, IH::new)) != null && !IterableUtils.isEmpty(ms)) {
@@ -666,11 +670,17 @@ class MainServletTest {
 	}
 
 	@Test
+	void testGetIValue0() throws IllegalAccessException, InvocationTargetException {
+		//
+		Assert.assertEquals(invoke(METHOD_GET_IVALUE0, null, "/getProviderName", Reflection.newProxy(CLASS_JNA, ih)),
+				Unit.with(null));
+		//
+	}
+
+	@Test
 	void testJna() throws ClassNotFoundException {
 		//
-		final Class<?> clz = Class.forName("javax.servlet.http.MainServlet$Jna");
-		//
-		final Method[] ms = clz != null ? clz.getDeclaredMethods() : null;
+		final Method[] ms = CLASS_JNA != null ? CLASS_JNA.getDeclaredMethods() : null;
 		//
 		Method m = null;
 		//
@@ -729,8 +739,8 @@ class MainServletTest {
 				//
 			} else {
 				//
-				result = Narcissus.invokeMethod(jna = ObjectUtils.getIfNull(jna, () -> Reflection.newProxy(clz, ih)), m,
-						os);
+				result = Narcissus.invokeMethod(
+						jna = ObjectUtils.getIfNull(jna, () -> Reflection.newProxy(CLASS_JNA, ih)), m, os);
 				//
 			} // if
 				//
@@ -750,7 +760,7 @@ class MainServletTest {
 									int[].class, Integer.TYPE }))
 					|| Boolean.logicalAnd(Objects.equals(name, "writeVoiceToFile"),
 							Arrays.equals(parameterTypes,
-									new Class<?>[] { clz, int[].class, Integer.TYPE, String.class, Integer.TYPE,
+									new Class<?>[] { CLASS_JNA, int[].class, Integer.TYPE, String.class, Integer.TYPE,
 											Integer.TYPE, int[].class, Integer.TYPE }))
 					|| Boolean.logicalAnd(Objects.equals(name, "speak"), Arrays.equals(parameterTypes,
 							new Class<?>[] { int[].class, Integer.TYPE, String.class, Integer.TYPE, Integer.TYPE }))) {
@@ -779,16 +789,14 @@ class MainServletTest {
 			//
 			toString = Objects.toString(m);
 			//
-			System.err.println(toString);
-			//
 			if (Modifier.isStatic(m.getModifiers())) {
 				//
 				result = Narcissus.invokeStaticMethod(m, os);
 				//
 			} else {
 				//
-				result = Narcissus.invokeMethod(jna = ObjectUtils.getIfNull(jna, () -> Reflection.newProxy(clz, ih)), m,
-						os);
+				result = Narcissus.invokeMethod(
+						jna = ObjectUtils.getIfNull(jna, () -> Reflection.newProxy(CLASS_JNA, ih)), m, os);
 				//
 			} // if
 				//

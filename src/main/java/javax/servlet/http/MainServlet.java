@@ -34,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.javatuples.Unit;
+import org.javatuples.valueintf.IValue0;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.j256.simplemagic.ContentInfo;
@@ -98,32 +100,30 @@ public class MainServlet extends HttpServlet {
 		//
 		final String servletPath = getServletPath(request);
 		//
-		final Iterable<Method> ms = collect(filter(Arrays.stream(Jna.class.getDeclaredMethods()),
-				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
-				Collectors.toList());
-		//
 		final boolean isWindows = Objects.equals(getName(getClass(FileSystems.getDefault())),
 				"sun.nio.fs.WindowsFileSystem");
 		//
 		final Jna jna = testAndGet(isWindows, () -> Native.load("MicrosoftSpeechApi.dll", Jna.class));
 		//
-		if (IterableUtils.size(ms) == 1 && jna != null) {
+		try {
 			//
-			final Method method = IterableUtils.get(ms, 0);
+			final IValue0<Object> iValue0 = getIValue0(servletPath, jna);
 			//
-			try (final OutputStream os = getOutputStream(response)) {
+			if (iValue0 != null) {
 				//
-				write(os, getBytes(Objects.toString(method != null ? method.invoke(jna) : null)));
+				try (final OutputStream os = getOutputStream(response)) {
+					//
+					write(os, getBytes(Objects.toString(iValue0.getValue0())));
+					//
+				} // try
+					//
+			} // if
 				//
-			} catch (final IllegalAccessException | InvocationTargetException e) {
-				//
-				throw new ServletException(e);
-				//
-			} // try
-				//
-			return;
+		} catch (final IllegalAccessException | InvocationTargetException e) {
 			//
-		} // if
+			throw new ServletException(e);
+			//
+		} // try
 			//
 		if (Objects.equals(servletPath, "/getVoiceIds")) {
 			//
@@ -229,6 +229,26 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static IValue0<Object> getIValue0(final String servletPath, final Jna jna)
+			throws IllegalAccessException, InvocationTargetException {
+		//
+		final Iterable<Method> ms = collect(filter(Arrays.stream(Jna.class.getDeclaredMethods()),
+				m -> Boolean.logicalAnd(Objects.equals("/" + getName(m), servletPath), getParameterCount(m) == 0)),
+				Collectors.toList());
+		//
+		if (IterableUtils.size(ms) == 1 
+				&& jna != null) {
+			//
+			final Method method = IterableUtils.get(ms, 0);
+			//
+			return Unit.with(method != null ? method.invoke(jna) : null);
+			//
+		} // if
+			//
+		return null;
+		//
 	}
 
 	private static boolean and(final boolean a, final boolean b, final boolean... bs) {

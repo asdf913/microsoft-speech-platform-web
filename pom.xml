@@ -71,6 +71,12 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.21.3</version>
 		</dependency>
+		<!--https://mvnrepository.com/artifact/org.javatuples/javatuples -->
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>1.2</version>
+		</dependency>
 		<!--https://mvnrepository.com/artifact/org.testng/testngs -->
 		<dependency>
 			<groupId>org.testng</groupId>
