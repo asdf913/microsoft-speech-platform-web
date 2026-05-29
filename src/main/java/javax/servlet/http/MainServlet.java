@@ -154,13 +154,11 @@ public class MainServlet extends HttpServlet {
 				//
 				if (length(ss) > 0) {
 					//
-					if ((hkey = testAndApply(
-							x -> IterableUtils.size(x) == 1, collect(
-									filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
-											f -> Objects.equals(getType(f), HKEY.class)
-													&& Objects.equals(getName(f), ArrayUtils.get(ss, 0)))
-											.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))),
-									Collectors.toList()),
+					if ((hkey = testAndApply(x -> IterableUtils.size(x) == 1,
+							collect(filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
+									f -> Boolean.logicalAnd(Objects.equals(getType(f), HKEY.class),
+											Objects.equals(getName(f), ArrayUtils.get(ss, 0))))
+									.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))), Collectors.toList()),
 							x -> IterableUtils.get(x, 0), null)) != null) {
 						//
 						registryKeyExists = isWindows && Advapi32Util.registryKeyExists(hkey, key);
