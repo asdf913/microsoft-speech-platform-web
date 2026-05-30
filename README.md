@@ -48,7 +48,7 @@
   <tbody>
     <tr>
       <td>Text to Speech</td>
-      <td>http://127.0.0.:8080/wav?text=日本語</td>
+      <td>http://127.0.0.:8080/日本語.wav</td>
     </tr>
   </tbody>
 </table>
