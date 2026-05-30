@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,7 +54,7 @@ class MainServletTest {
 
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
 			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH, METHOD_AND,
-			METHOD_GET_IVALUE0 = null;
+			METHOD_GET_IVALUE0, METHOD_GET_NAME, METHOD_GET_CLASS = null;
 
 	@BeforeSuite
 	void beforeSuite() throws NoSuchMethodException, ClassNotFoundException {
@@ -86,6 +87,10 @@ class MainServletTest {
 		//
 		(METHOD_GET_IVALUE0 = clz.getDeclaredMethod("getIValue0", String.class,
 				CLASS_JNA = Class.forName("javax.servlet.http.MainServlet$Jna"))).setAccessible(true);
+		//
+		(METHOD_GET_NAME = clz.getDeclaredMethod("getName", Class.class)).setAccessible(true);
+		//
+		(METHOD_GET_CLASS = clz.getDeclaredMethod("getClass", Object.class)).setAccessible(true);
 		//
 		CLASS_INT_MAP = Class.forName("javax.servlet.http.MainServlet$IntMap");
 		//
@@ -966,7 +971,7 @@ class MainServletTest {
 	}
 
 	@Test
-	void testIH() throws ClassNotFoundException {
+	void testIH() throws Throwable {
 		//
 		final Class<?> clz = Class.forName("javax.servlet.http.MainServlet$IH");
 		//
@@ -986,7 +991,7 @@ class MainServletTest {
 		//
 		Class<?> parameterType = null;
 		//
-		Object invocationHandler = null;
+		Object object = null;
 		//
 		if (ih != null) {
 			//
@@ -1014,14 +1019,13 @@ class MainServletTest {
 			} else if (Boolean.logicalAnd(Objects.equals(getName(m), "invoke"),
 					Arrays.equals(parameterTypes, new Class<?>[] { Object.class, Method.class, Object[].class }))) {
 				//
-				final Object object = invocationHandler = ObjectUtils.getIfNull(invocationHandler,
-						() -> Narcissus.allocateInstance(clz));
+				final Object o = object = ObjectUtils.getIfNull(object, () -> Narcissus.allocateInstance(clz));
 				//
 				final Method m1 = m;
 				//
 				final Object[] os1 = os;
 				//
-				Assert.assertThrows(() -> Narcissus.invokeMethod(object, m1, os1));
+				Assert.assertThrows(() -> Narcissus.invokeMethod(o, m1, os1));
 				//
 				continue;
 				//
@@ -1069,6 +1073,49 @@ class MainServletTest {
 				//
 		} // for
 			//
+		if (!Objects.equals(getName(getClass(FileSystems.getDefault())), "sun.nio.fs.WindowsFileSystem")) {
+			//
+			final InvocationHandler invocationHandler = cast(InvocationHandler.class, object);
+			//
+			if (invocationHandler != null) {
+				//
+				Assert.assertThrows(
+						() -> invocationHandler.invoke(Reflection.newProxy(CLASS_INT_MAP, invocationHandler),
+								CLASS_INT_MAP != null ? CLASS_INT_MAP.getDeclaredMethod("getInt", String.class) : null,
+								new Object[] { null }));
+				//
+			} // if
+				//
+		} // if
+			//
+	}
+
+	private static String getName(final Class<?> instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_GET_NAME, null, instance);
+			if (obj == null) {
+				return null;
+			} else if (obj instanceof String) {
+				return (String) obj;
+			}
+			throw new Throwable(getName(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
+	}
+
+	private static Class<?> getClass(final Object instance) throws Throwable {
+		try {
+			final Object obj = invoke(METHOD_GET_CLASS, null, instance);
+			if (obj == null) {
+				return null;
+			} else if (obj instanceof Class<?>) {
+				return (Class<?>) obj;
+			}
+			throw new Throwable(getName(getClass(obj)));
+		} catch (final InvocationTargetException e) {
+			throw e.getTargetException();
+		}
 	}
 
 }

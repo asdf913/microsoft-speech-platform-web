@@ -140,12 +140,25 @@ public class MainServlet extends HttpServlet {
 						//
 					return get(map, arg);
 					//
+				} else if (Objects.equals(name, "setInt") && args != null && args.length > 1) {
+					//
+					put(map = ObjectUtils.getIfNull(map, LinkedHashMap::new), ArrayUtils.get(args, 0),
+							ArrayUtils.get(args, 1));
+					//
+					return null;
+					//
 				} // if
 					//
 			} // if
 				//
 			throw new Throwable(name);
 			//
+		}
+
+		private static <K, V> void put(final Map<K, V> instance, final K key, final V value) {
+			if (instance != null) {
+				instance.put(key, value);
+			}
 		}
 
 		private static boolean containsKey(final Map<?, ?> instance, final Object key) {
@@ -278,25 +291,28 @@ public class MainServlet extends HttpServlet {
 				final int[] ints1 = toIntArray(
 						StringUtils.substring(servletPath, 1, StringUtils.length(servletPath) - 4));
 				//
-				final String absolutePath = getAbsolutePath(file = File
-						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File(".")));
+				final int[] ints2 = toIntArray(getAbsolutePath(file = File
+						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File("."))));
 				//
 				if (ints1 != null) {
 					//
 					final IH ih = new IH();
 					//
-					put(ih.map = ObjectUtils.getIfNull(ih.map, LinkedHashMap::new), "textLength", length(ints1));
+					final IntMap intMap = Reflection.newProxy(IntMap.class, ih);
 					//
-					put(ih.map, "rate", NumberUtils.toInt(getParameter(request, "rate"), 0));
-					//
-					put(ih.map, "volume", NumberUtils.toInt(getParameter(request, "volume"), 100));
-					//
-					final int[] ints2 = toIntArray(absolutePath);
-					//
-					put(ih.map, "fileNameLength", length(ints2));
-					//
-					Jna.writeVoiceToFile(jna, Reflection.newProxy(IntMap.class, ih), ints1,
-							getParameter(request, "voiceId"), ints2);
+					if (intMap != null) {
+						//
+						intMap.setInt("textLength", length(ints1));
+						//
+						intMap.setInt("rate", NumberUtils.toInt(getParameter(request, "rate"), 0));
+						//
+						intMap.setInt("volume", NumberUtils.toInt(getParameter(request, "volume"), 100));
+						//
+						intMap.setInt("fileNameLength", length(ints2));
+						//
+					} // if
+						//
+					Jna.writeVoiceToFile(jna, intMap, ints1, getParameter(request, "voiceId"), ints2);
 					//
 				} // if
 					//
@@ -316,12 +332,6 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
-	}
-
-	private static <K, V> void put(final Map<K, V> instance, final K key, final V value) {
-		if (instance != null) {
-			instance.put(key, value);
-		}
 	}
 
 	private static IValue0<Object> getIValue0(final String servletPath, final Jna jna)
