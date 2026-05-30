@@ -62,6 +62,8 @@ public class MainServlet extends HttpServlet {
 
 	private static final String APPLICATION_JSON = "application/json";
 
+	private static final String VOLUME = "volume";
+
 	private interface Jna extends Library {
 
 		public boolean isInstalled();
@@ -96,7 +98,7 @@ public class MainServlet extends HttpServlet {
 			if (instance != null) {
 				//
 				instance.writeVoiceToFile(text, IntMap.getInt(intMap, "textLength", 0), voiceId,
-						IntMap.getInt(intMap, "rate", 0), IntMap.getInt(intMap, "volume", 0), fileName,
+						IntMap.getInt(intMap, "rate", 0), IntMap.getInt(intMap, VOLUME, 0), fileName,
 						IntMap.getInt(intMap, "fileNameLength", 0));
 				//
 			} // if
@@ -306,7 +308,7 @@ public class MainServlet extends HttpServlet {
 						//
 						intMap.setInt("rate", NumberUtils.toInt(getParameter(request, "rate"), 0));
 						//
-						intMap.setInt("volume", NumberUtils.toInt(getParameter(request, "volume"), 100));
+						intMap.setInt(VOLUME, NumberUtils.toInt(getParameter(request, VOLUME), 100));
 						//
 						intMap.setInt("fileNameLength", length(ints2));
 						//
