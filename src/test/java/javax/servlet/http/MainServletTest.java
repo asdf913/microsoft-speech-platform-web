@@ -50,7 +50,7 @@ import javassist.util.proxy.ProxyObject;
 
 class MainServletTest {
 
-	private static Class<?> CLASS_JNA = null, CLASS_INT_MAP = null;;
+	private static Class<?> CLASS_JNA = null, CLASS_INT_MAP = null;
 
 	private static Method METHOD_TEST, METHOD_TO_INT_ARRAY, METHOD_COLLECT, METHOD_TEST_AND_ACCEPT, METHOD_CAST,
 			METHOD_TEST_AND_GET, METHOD_TEST_AND_TEST, METHOD_STARTS_WITH, METHOD_ENDS_WITH, METHOD_AND,
