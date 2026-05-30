@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -12,6 +13,8 @@ import java.lang.reflect.Proxy;
 import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -29,6 +32,7 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
@@ -38,6 +42,7 @@ import org.javatuples.Unit;
 import org.javatuples.valueintf.IValue0;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.reflect.Reflection;
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
 import com.j256.simplemagic.ContentType;
@@ -85,11 +90,70 @@ public class MainServlet extends HttpServlet {
 			return instance != null ? instance.getVoiceAttribute(voiceId, attribute) : null;
 		}
 
-		static void writeVoiceToFile(final Jna instance, final int[] text, final int textLength, final String voiceId,
-				final int rate, final int volume, final int[] fileName, final int fileNameLength) {
+		static void writeVoiceToFile(final Jna instance, final IntMap intMap, final int[] text, final String voiceId,
+				final int[] fileName) {
+			//
 			if (instance != null) {
-				instance.writeVoiceToFile(text, textLength, voiceId, rate, volume, fileName, fileNameLength);
-			}
+				//
+				instance.writeVoiceToFile(text, IntMap.getInt(intMap, "textLength", 0), voiceId,
+						IntMap.getInt(intMap, "rate", 0), IntMap.getInt(intMap, "volume", 0), fileName,
+						IntMap.getInt(intMap, "fileNameLength", 0));
+				//
+			} // if
+				//
+		}
+
+	}
+
+	private static interface IntMap {
+
+		int getInt(final String key);
+
+		void setInt(final String key, final int value);
+
+		static int getInt(final IntMap instance, final String key, final int defaultValue) {
+			return instance != null ? instance.getInt(key) : defaultValue;
+		}
+
+	}
+
+	private static class IH implements InvocationHandler {
+
+		private Map<Object, Object> map = null;
+
+		@Override
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+			//
+			final String name = getName(method);
+			//
+			if (proxy instanceof IntMap) {
+				//
+				if (Objects.equals(name, "getInt") && args != null && args.length > 0) {
+					//
+					final Object arg = ArrayUtils.get(args, 0);
+					//
+					if (!containsKey(map = ObjectUtils.getIfNull(map, LinkedHashMap::new), arg)) {
+						//
+						throw new IllegalStateException(String.format("Key not found [%1$s]", arg));
+						//
+					} // if
+						//
+					return get(map, arg);
+					//
+				} // if
+					//
+			} // if
+				//
+			throw new Throwable(name);
+			//
+		}
+
+		private static boolean containsKey(final Map<?, ?> instance, final Object key) {
+			return instance != null && instance.containsKey(key);
+		}
+
+		private static <V> V get(final Map<?, V> instance, final Object key) {
+			return instance != null ? instance.get(key) : null;
 		}
 
 	}
@@ -211,19 +275,28 @@ public class MainServlet extends HttpServlet {
 			//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
-				int[] ints = toIntArray(StringUtils.substring(servletPath, 1, StringUtils.length(servletPath) - 4));
+				final int[] ints1 = toIntArray(
+						StringUtils.substring(servletPath, 1, StringUtils.length(servletPath) - 4));
 				//
 				final String absolutePath = getAbsolutePath(file = File
 						.createTempFile(RandomStringUtils.secureStrong().nextAlphabetic(3), null, new File(".")));
 				//
-				if (ints != null) {
+				if (ints1 != null) {
 					//
-					Jna.writeVoiceToFile(jna, ints, length(ints), getParameter(request, "voiceId")
+					final IH ih = new IH();
 					//
-							, NumberUtils.toInt(getParameter(request, "rate"), 0) // rate
-							, NumberUtils.toInt(getParameter(request, "volume"), 100) // volume
-							//
-							, ints = toIntArray(absolutePath), length(ints));
+					put(ih.map = ObjectUtils.getIfNull(ih.map, LinkedHashMap::new), "textLength", length(ints1));
+					//
+					put(ih.map, "rate", NumberUtils.toInt(getParameter(request, "rate"), 0));
+					//
+					put(ih.map, "volume", NumberUtils.toInt(getParameter(request, "volume"), 100));
+					//
+					final int[] ints2 = toIntArray(absolutePath);
+					//
+					put(ih.map, "fileNameLength", length(ints2));
+					//
+					Jna.writeVoiceToFile(jna, Reflection.newProxy(IntMap.class, ih), ints1,
+							getParameter(request, "voiceId"), ints2);
 					//
 				} // if
 					//
@@ -243,6 +316,12 @@ public class MainServlet extends HttpServlet {
 				//
 		} // if
 			//
+	}
+
+	private static <K, V> void put(final Map<K, V> instance, final K key, final V value) {
+		if (instance != null) {
+			instance.put(key, value);
+		}
 	}
 
 	private static IValue0<Object> getIValue0(final String servletPath, final Jna jna)
