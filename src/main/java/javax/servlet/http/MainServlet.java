@@ -37,6 +37,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableSupplier;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.stream.Streams.FailableStream;
@@ -247,16 +248,15 @@ public class MainServlet extends HttpServlet {
 				//
 				HKEY hkey = null;
 				//
-				if (length(ss) > 0 && (hkey = testAndApply(x -> IterableUtils.size(x) == 1,
-						collect(new FailableStream<Field>(filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
+				if (length(ss) > 0 && (hkey = testAndApply(x -> IterableUtils.size(x) == 1, collect(
+						new FailableStream<Field>(filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
 								f -> Boolean.logicalAnd(Objects.equals(getType(f), HKEY.class),
 										Objects.equals(getName(f), ArrayUtils.get(ss, 0)))))
-												.map(f -> Narcissus.libraryLoaded
-														? cast(HKEY.class, Narcissus.getStaticField(f))
-														: cast(HKEY.class, FieldUtils.readStaticField(f, true)))
-												.stream(),
-								Collectors.toList()),
-						x -> IterableUtils.get(x, 0), null)) != null) {
+								.map(f -> cast(HKEY.class,
+										testAndGet(Narcissus.libraryLoaded, () -> Narcissus.getStaticField(f),
+												() -> FieldUtils.readStaticField(f, true))))
+								.stream(),
+						Collectors.toList()), x -> IterableUtils.get(x, 0), null)) != null) {
 					//
 					registryKeyExists = testAndTest(isWindows, Advapi32Util::registryKeyExists, hkey, key);
 					//
@@ -283,6 +283,15 @@ public class MainServlet extends HttpServlet {
 			//
 		write(request, response, jna);
 		//
+	}
+
+	private static <T, E extends Throwable> T testAndGet(final boolean condition,
+			final FailableSupplier<T, E> supplierTrue, final FailableSupplier<T, E> supplierFalse) throws E {
+		return condition ? get(supplierTrue) : get(supplierFalse);
+	}
+
+	private static <T, E extends Throwable> T get(final FailableSupplier<T, E> instance) throws E {
+		return instance != null ? instance.get() : null;
 	}
 
 	private static void write(final HttpServletRequest request, final ServletResponse response, final Jna jna)

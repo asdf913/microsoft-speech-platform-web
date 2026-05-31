@@ -34,6 +34,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableSupplier;
 import org.javatuples.Unit;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -197,6 +198,10 @@ class MainServletTest {
 			} else if (proxy instanceof BooleanSupplier && Objects.equals(name, "getAsBoolean")) {
 				//
 				return getAsBoolean;
+				//
+			} else if (proxy instanceof FailableSupplier && Objects.equals(name, "get")) {
+				//
+				return null;
 				//
 			} // if
 				//
