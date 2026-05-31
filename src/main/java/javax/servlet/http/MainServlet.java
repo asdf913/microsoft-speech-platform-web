@@ -388,6 +388,12 @@ public class MainServlet extends HttpServlet {
 			//
 		} // if
 			//
+		if (Boolean.logicalAnd(!isTestMode(), !Narcissus.libraryLoaded)) {
+			//
+			return a.startsWith(b);
+			//
+		} // if
+			//
 		final Field value = testAndApply(x -> IterableUtils.size(x) == 1,
 				collect(filter(stream(FieldUtils.getAllFieldsList(getClass(a))),
 						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
@@ -403,6 +409,12 @@ public class MainServlet extends HttpServlet {
 		if (a == null || b == null) {
 			//
 			return false;
+			//
+		} // if
+			//
+		if (Boolean.logicalAnd(!isTestMode(), !Narcissus.libraryLoaded)) {
+			//
+			return a.endsWith(b);
 			//
 		} // if
 			//
