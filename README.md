@@ -42,7 +42,6 @@
     </tr>
   </tbody>
 </table>
-
 ## URL
 <table>
   <tbody>
@@ -82,9 +81,25 @@
       <td>win64</td>
     </tr>
     <tr>
-      <td>Voice&nbsp;IDS</td>
+      <td>Voice&nbsp;IDs</td>
       <td>http://127.0.0.1:8080/getVoiceIds</td>
       <td></td>
+    </tr>
+    <tr>
+      <td>Voice&nbsp;Attributes&nbsp;by&nbsp;ID</td>
+      <td>http://127.0.0.1:8080/HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech%20Server\v11.0\Voices\Tokens\TTS_MS_ja-JP_Haruka_11.0</td>
+      <td>
+        <pre>{
+  "": "",
+  "Age": "Adult",
+  "AudioFormats": "18",
+  "Gender": "Female",
+  "Language": "411",
+  "Name": "Microsoft Server Speech Text to Speech Voice (ja-JP, Haruka)",
+  "Vendor": "Microsoft",
+  "Version": "11.0"
+}</pre>
+      </td>
     </tr>
   </tbody>
 </table>
