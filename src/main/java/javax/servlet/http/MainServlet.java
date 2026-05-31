@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -392,9 +393,8 @@ public class MainServlet extends HttpServlet {
 						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
-		return value == null
-				|| Boolean.logicalAnd(Narcissus.getField(a, value) != null, Narcissus.getField(b, value) != null)
-						&& a.startsWith(b);
+		return value == null || and(Narcissus.libraryLoaded, () -> Narcissus.getField(a, value) != null,
+				() -> Narcissus.getField(b, value) != null) && a.startsWith(b);
 		//
 	}
 
@@ -411,10 +411,17 @@ public class MainServlet extends HttpServlet {
 						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> IterableUtils.get(x, 0), null);
 		//
-		return value == null
-				|| Boolean.logicalAnd(Narcissus.getField(a, value) != null, Narcissus.getField(b, value) != null)
-						&& a.endsWith(b);
+		return value == null || and(Narcissus.libraryLoaded, () -> Narcissus.getField(a, value) != null,
+				() -> Narcissus.getField(b, value) != null) && a.endsWith(b);
 		//
+	}
+
+	private static boolean and(final boolean condition, final BooleanSupplier a, final BooleanSupplier b) {
+		return condition && getAsBoolean(a) && getAsBoolean(b);
+	}
+
+	private static boolean getAsBoolean(final BooleanSupplier instance) {
+		return instance != null && instance.getAsBoolean();
 	}
 
 	private static <T, U> boolean testAndTest(final boolean condition, final BiPredicate<T, U> predicate, final T t,

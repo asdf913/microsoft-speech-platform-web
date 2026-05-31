@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -98,7 +99,7 @@ class MainServletTest {
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, isInstalled, containsKey;
+		private Boolean test, isInstalled, containsKey, getAsBoolean;
 
 		private String servletPath;
 
@@ -193,6 +194,10 @@ class MainServletTest {
 					//
 				} // if
 					//
+			} else if (proxy instanceof BooleanSupplier && Objects.equals(name, "getAsBoolean")) {
+				//
+				return getAsBoolean;
+				//
 			} // if
 				//
 			throw new Throwable(name);
@@ -360,7 +365,7 @@ class MainServletTest {
 		//
 		if (ih != null) {
 			//
-			ih.test = Boolean.TRUE;
+			ih.test = ih.getAsBoolean = Boolean.TRUE;
 			//
 		} // if
 			//
