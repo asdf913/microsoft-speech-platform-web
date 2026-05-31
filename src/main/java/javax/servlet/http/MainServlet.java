@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.stream.Streams.FailableStream;
 import org.javatuples.Unit;
 import org.javatuples.valueintf.IValue0;
 
@@ -247,10 +248,14 @@ public class MainServlet extends HttpServlet {
 				HKEY hkey = null;
 				//
 				if (length(ss) > 0 && (hkey = testAndApply(x -> IterableUtils.size(x) == 1,
-						collect(filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
+						collect(new FailableStream<Field>(filter(stream(FieldUtils.getAllFieldsList(WinReg.class)),
 								f -> Boolean.logicalAnd(Objects.equals(getType(f), HKEY.class),
-										Objects.equals(getName(f), ArrayUtils.get(ss, 0))))
-								.map(f -> cast(HKEY.class, Narcissus.getStaticField(f))), Collectors.toList()),
+										Objects.equals(getName(f), ArrayUtils.get(ss, 0)))))
+												.map(f -> Narcissus.libraryLoaded
+														? cast(HKEY.class, Narcissus.getStaticField(f))
+														: cast(HKEY.class, FieldUtils.readStaticField(f, true)))
+												.stream(),
+								Collectors.toList()),
 						x -> IterableUtils.get(x, 0), null)) != null) {
 					//
 					registryKeyExists = testAndTest(isWindows, Advapi32Util::registryKeyExists, hkey, key);
