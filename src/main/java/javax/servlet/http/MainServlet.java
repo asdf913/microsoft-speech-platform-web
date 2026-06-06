@@ -190,12 +190,8 @@ public class MainServlet extends HttpServlet {
 		if (isWindows && contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath)
 				&& (jna == null || !jna.isInstalled())) {
 			//
-			if (response != null) {
-				//
-				response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-				//
-			} // if
-				//
+			sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
+			//
 			return;
 			//
 		} // if
@@ -226,12 +222,8 @@ public class MainServlet extends HttpServlet {
 			//
 			if (jna == null || !jna.isInstalled()) {
 				//
-				if (response != null) {
-					//
-					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-					//
-				} // if
-					//
+				sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
+				//
 				return;
 				//
 			} // if
@@ -249,11 +241,7 @@ public class MainServlet extends HttpServlet {
 			//
 			if (jna == null || !jna.isInstalled()) {
 				//
-				if (response != null) {
-					//
-					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-					//
-				} // if
+					sendError(response,HttpServletResponse.SC_NOT_IMPLEMENTED);
 					//
 				return;
 				//
@@ -322,6 +310,12 @@ public class MainServlet extends HttpServlet {
 		//
 	}
 
+	private static void sendError(final HttpServletResponse instance, final int statusCode) throws IOException {
+		if (instance != null) {
+			instance.sendError(statusCode);
+		}
+	}
+
 	private static boolean contains(final Collection<?> instance, final Object item) {
 		return instance != null && instance.contains(item);
 	}
@@ -344,12 +338,8 @@ public class MainServlet extends HttpServlet {
 			//
 			if (jna == null || !jna.isInstalled()) {
 				//
-				if (response != null) {
-					//
-					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-					//
-				} // if
-					//
+				sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
+				//
 				return;
 				//
 			} // if
