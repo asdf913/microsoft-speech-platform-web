@@ -782,7 +782,8 @@ class MainServletTest {
 	}
 
 	@Test
-	void testJna() throws ClassNotFoundException {
+	void testJna()
+			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		//
 		final Method[] ms = CLASS_JNA != null ? CLASS_JNA.getDeclaredMethods() : null;
 		//
@@ -916,6 +917,23 @@ class MainServletTest {
 				//
 		} // for
 			//
+		final Method method = CLASS_JNA != null ? CLASS_JNA.getDeclaredMethod("isInstalled", CLASS_JNA) : null;
+		//
+		final Object object = Narcissus.invokeStaticMethod(method,
+				jna = ObjectUtils.getIfNull(jna, () -> Reflection.newProxy(CLASS_JNA, ih)));
+		//
+		Assert.assertNotNull(object);
+		//
+		final Boolean isInstalled = cast(Boolean.class, object);
+		//
+		if (ih != null && isInstalled != null) {
+			//
+			ih.isInstalled = Boolean.valueOf(!isInstalled.booleanValue());
+			//
+		} // if
+			//
+		Assert.assertNotNull(Narcissus.invokeStaticMethod(method, jna));
+		//
 	}
 
 	@Test

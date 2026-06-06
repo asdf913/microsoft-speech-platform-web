@@ -86,6 +86,10 @@ public class MainServlet extends HttpServlet {
 
 		public String getProviderPlatform();
 
+		static boolean isInstalled(final Jna instance) {
+			return instance != null && instance.isInstalled();
+		}
+
 		static String getVoiceIds(final Jna instance, final String requiredAttributes,
 				final String optionalAttributes) {
 			return instance != null ? instance.getVoiceIds(requiredAttributes, optionalAttributes) : null;
@@ -187,8 +191,8 @@ public class MainServlet extends HttpServlet {
 		//
 		final Jna jna = testAndGet(isWindows, () -> Native.load("MicrosoftSpeechApi.dll", Jna.class));
 		//
-		if (isWindows && contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath)
-				&& (jna == null || !jna.isInstalled())) {
+		if (contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath)
+				&& !Jna.isInstalled(jna)) {
 			//
 			sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
 			//
@@ -220,7 +224,7 @@ public class MainServlet extends HttpServlet {
 			//
 		if (Objects.equals(servletPath, "/getVoiceIds")) {
 			//
-			if (jna == null || !jna.isInstalled()) {
+			if (!Jna.isInstalled(jna)) {
 				//
 				sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
 				//
@@ -239,10 +243,10 @@ public class MainServlet extends HttpServlet {
 				//
 		} else if (Objects.equals(servletPath, "/getVoiceAttribute")) {
 			//
-			if (jna == null || !jna.isInstalled()) {
+			if (!Jna.isInstalled(jna)) {
 				//
-					sendError(response,HttpServletResponse.SC_NOT_IMPLEMENTED);
-					//
+				sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
+				//
 				return;
 				//
 			} // if
@@ -336,7 +340,7 @@ public class MainServlet extends HttpServlet {
 		//
 		if (and(startsWith(servletPath, "/"), endsWith(servletPath, ".wav"), StringUtils.length(servletPath) > 5)) {
 			//
-			if (jna == null || !jna.isInstalled()) {
+			if (!Jna.isInstalled(jna)) {
 				//
 				sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
 				//
