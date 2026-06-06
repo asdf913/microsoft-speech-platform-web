@@ -1,6 +1,5 @@
 package javax.servlet.http;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -26,7 +25,6 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
@@ -35,6 +33,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableSupplier;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.javatuples.Unit;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -44,6 +43,7 @@ import org.testng.annotations.Test;
 import com.google.common.base.Predicates;
 import com.google.common.base.Suppliers;
 import com.google.common.reflect.Reflection;
+import com.sun.jna.Native;
 
 import io.github.toolfactory.narcissus.Narcissus;
 import javassist.util.proxy.MethodHandler;
@@ -100,7 +100,7 @@ class MainServletTest {
 
 	private static class IH implements InvocationHandler {
 
-		private Boolean test, isInstalled, containsKey, getAsBoolean;
+		private Boolean test, isInstalled, containsKey, getAsBoolean, contains;
 
 		private String servletPath;
 
@@ -108,17 +108,25 @@ class MainServletTest {
 
 		private Integer intValue = null;
 
+		private Object[] arguments = null;
+
 		@Override
 		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
 			//
+			final String name = MainServletTest.getName(method);
+			//
+			if (proxy instanceof HttpServletResponse && Objects.equals(name, "sendError")) {
+				//
+				arguments = args;
+				//
+			} // if
+				//
 			if (Objects.equals(getReturnType(method), Void.TYPE)) {
 				//
 				return null;
 				//
 			} // if
 				//
-			final String name = MainServletTest.getName(method);
-			//
 			if (proxy instanceof ServletResponse) {
 				//
 				if (Objects.equals(name, "getOutputStream")) {
@@ -202,6 +210,10 @@ class MainServletTest {
 			} else if (proxy instanceof FailableSupplier && Objects.equals(name, "get")) {
 				//
 				return null;
+				//
+			} else if (proxy instanceof Collection && Objects.equals(name, "contains")) {
+				//
+				return contains;
 				//
 			} // if
 				//
@@ -370,7 +382,7 @@ class MainServletTest {
 		//
 		if (ih != null) {
 			//
-			ih.test = ih.getAsBoolean = Boolean.TRUE;
+			ih.test = ih.getAsBoolean = ih.contains = Boolean.TRUE;
 			//
 		} // if
 			//
@@ -514,7 +526,7 @@ class MainServletTest {
 	}
 
 	@Test
-	void testDoGet() throws ServletException, IOException {
+	void testDoGet() throws Throwable {
 		//
 		if (instance == null) {
 			//
@@ -543,6 +555,23 @@ class MainServletTest {
 			//
 		instance.doGet(httpServletRequest, null);
 		//
+		final HttpServletResponse httpServletResponse = Reflection.newProxy(HttpServletResponse.class, ih);
+		//
+		instance.doGet(httpServletRequest, httpServletResponse);
+		//
+		final boolean isWindows = Objects.equals(getName(getClass(FileSystems.getDefault())),
+				"sun.nio.fs.WindowsFileSystem");
+		//
+		final Object jna = isWindows ? MethodUtils.invokeStaticMethod(Native.class, "load", "MicrosoftSpeechApi.dll",
+				Class.forName("javax.servlet.http.MainServlet$Jna")) : null;
+		//
+		if (isWindows && Objects.equals(MethodUtils.invokeMethod(jna, true, "isInstalled"), Boolean.FALSE)) {
+			//
+			Assert.assertEquals(ih != null ? ih.arguments : null,
+					new Object[] { Integer.valueOf(HttpServletResponse.SC_NOT_IMPLEMENTED) });
+			//
+		} // if
+			//
 		if (ih != null) {
 			//
 			ih.servletPath = "/getVoiceAttribute";
@@ -551,6 +580,15 @@ class MainServletTest {
 			//
 		instance.doGet(httpServletRequest, null);
 		//
+		instance.doGet(httpServletRequest, httpServletResponse);
+		//
+		if (isWindows && Objects.equals(MethodUtils.invokeMethod(jna, true, "isInstalled"), Boolean.FALSE)) {
+			//
+			Assert.assertEquals(ih != null ? ih.arguments : null,
+					new Object[] { Integer.valueOf(HttpServletResponse.SC_NOT_IMPLEMENTED) });
+			//
+		} // if
+			//
 		if (ih != null) {
 			//
 			ih.servletPath = "/getVoiceAttributes";
@@ -606,6 +644,32 @@ class MainServletTest {
 			//
 		instance.doGet(httpServletRequest, null);
 		//
+		instance.doGet(httpServletRequest, httpServletResponse);
+		//
+		if (isWindows && Objects.equals(MethodUtils.invokeMethod(jna, true, "isInstalled"), Boolean.FALSE)) {
+			//
+			Assert.assertEquals(ih != null ? ih.arguments : null,
+					new Object[] { Integer.valueOf(HttpServletResponse.SC_NOT_IMPLEMENTED) });
+			//
+		} // if
+			//
+		if (ih != null) {
+			//
+			ih.servletPath = "/getProviderVersion";
+			//
+		} // if
+			//
+		instance.doGet(httpServletRequest, null);
+		//
+		instance.doGet(httpServletRequest, httpServletResponse);
+		//
+		if (isWindows && Objects.equals(MethodUtils.invokeMethod(jna, true, "isInstalled"), Boolean.FALSE)) {
+			//
+			Assert.assertEquals(ih != null ? ih.arguments : null,
+					new Object[] { Integer.valueOf(HttpServletResponse.SC_NOT_IMPLEMENTED) });
+			//
+		} // if
+			//
 	}
 
 	@Test

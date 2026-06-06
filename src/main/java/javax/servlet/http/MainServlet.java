@@ -187,6 +187,19 @@ public class MainServlet extends HttpServlet {
 		//
 		final Jna jna = testAndGet(isWindows, () -> Native.load("MicrosoftSpeechApi.dll", Jna.class));
 		//
+		if (isWindows && contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath)
+				&& (jna == null || !jna.isInstalled())) {
+			//
+			if (response != null) {
+				//
+				response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+				//
+			} // if
+				//
+			return;
+			//
+		} // if
+			//
 		try {
 			//
 			final IValue0<Object> iValue0 = getIValue0(servletPath, jna);
@@ -211,6 +224,18 @@ public class MainServlet extends HttpServlet {
 			//
 		if (Objects.equals(servletPath, "/getVoiceIds")) {
 			//
+			if (jna == null || !jna.isInstalled()) {
+				//
+				if (response != null) {
+					//
+					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+					//
+				} // if
+					//
+				return;
+				//
+			} // if
+				//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
 				setContentType(response, APPLICATION_JSON);
@@ -222,6 +247,18 @@ public class MainServlet extends HttpServlet {
 				//
 		} else if (Objects.equals(servletPath, "/getVoiceAttribute")) {
 			//
+			if (jna == null || !jna.isInstalled()) {
+				//
+				if (response != null) {
+					//
+					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+					//
+				} // if
+					//
+				return;
+				//
+			} // if
+				//
 			try (final OutputStream os = getOutputStream(response)) {
 				//
 				setContentType(response, APPLICATION_JSON);
@@ -285,6 +322,10 @@ public class MainServlet extends HttpServlet {
 		//
 	}
 
+	private static boolean contains(final Collection<?> instance, final Object item) {
+		return instance != null && instance.contains(item);
+	}
+
 	private static <T, E extends Throwable> T testAndGet(final boolean condition,
 			final FailableSupplier<T, E> supplierTrue, final FailableSupplier<T, E> supplierFalse) throws E {
 		return condition ? get(supplierTrue) : get(supplierFalse);
@@ -294,13 +335,25 @@ public class MainServlet extends HttpServlet {
 		return instance != null ? instance.get() : null;
 	}
 
-	private static void write(final HttpServletRequest request, final ServletResponse response, final Jna jna)
+	private static void write(final HttpServletRequest request, final HttpServletResponse response, final Jna jna)
 			throws IOException {
 		//
 		final String servletPath = getServletPath(request);
 		//
 		if (and(startsWith(servletPath, "/"), endsWith(servletPath, ".wav"), StringUtils.length(servletPath) > 5)) {
 			//
+			if (jna == null || !jna.isInstalled()) {
+				//
+				if (response != null) {
+					//
+					response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+					//
+				} // if
+					//
+				return;
+				//
+			} // if
+				//
 			File file = null;
 			//
 			try (final OutputStream os = getOutputStream(response)) {
@@ -360,9 +413,7 @@ public class MainServlet extends HttpServlet {
 		//
 		if (IterableUtils.size(ms) == 1 && jna != null) {
 			//
-			final Method method = IterableUtils.get(ms, 0);
-			//
-			return Unit.with(method != null ? method.invoke(jna) : null);
+			return Unit.with(Narcissus.invokeMethod(jna, IterableUtils.get(ms, 0)));
 			//
 		} // if
 			//
