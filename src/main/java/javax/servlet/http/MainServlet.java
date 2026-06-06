@@ -191,8 +191,8 @@ public class MainServlet extends HttpServlet {
 		//
 		final Jna jna = testAndGet(isWindows, () -> Native.load("MicrosoftSpeechApi.dll", Jna.class));
 		//
-		if (contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath)
-				&& !Jna.isInstalled(jna)) {
+		if (Boolean.logicalAnd(contains(Arrays.asList("/getProviderVersion", "/getProviderPlatform"), servletPath),
+				!Jna.isInstalled(jna))) {
 			//
 			sendError(response, HttpServletResponse.SC_NOT_IMPLEMENTED);
 			//
