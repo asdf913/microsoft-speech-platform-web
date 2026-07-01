@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
-			<version>5.19.0</version>
+			<version>5.19.1</version>
 		</dependency>
 		<!--https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
